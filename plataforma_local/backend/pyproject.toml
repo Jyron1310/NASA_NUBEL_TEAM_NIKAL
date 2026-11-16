@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "firecal-peru"
+version = "0.1.0"
+description = "Backend local de Nikal Perú: calendario de quemas armonizado MODIS/VIIRS (NASA Space Apps 2026)."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic>=2",
+    "pydantic-settings",
+    "duckdb",
+    "pyarrow",
+    "pandas",
+    "numpy",
+    "shapely>=2",
+    "pyproj",
+    "httpx",
+    "typer",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+
+[project.scripts]
+firecal = "firecal.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["firecal*", "api*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["data", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# Plantilla HTML con textos bilingües largos: partirlos los hace ilegibles.
+"firecal/plan/informe.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+filterwarnings = [
+    # Aviso de Starlette: recomienda httpx2 para TestClient. No agregamos dependencias.
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+]

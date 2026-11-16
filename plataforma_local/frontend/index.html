@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0a0a" />
+    <meta name="description" content="Harmonized MODIS + VIIRS hotspot calendar for Cusco, Peru (NASA FIRMS, 2000-2025)." />
+    <link rel="icon" type="image/svg+xml" href="./nikal-favicon.svg" />
+    <link rel="preload" as="image" href="./nikal-icono.svg" />
+    <title>Nikal Cusco · Harmonized MODIS + VIIRS calendar</title>
+    <style>
+      /* Apertura de marca (≈ 6 s). Va en el HTML para verse en la primera pintura, sin esperar a la app.
+         Solo anima transform y opacity (no se traba mientras el mapa arranca) y se cierra sola por CSS. */
+      html,body{background:#0b0a0a}
+      #nk-intro{position:fixed;inset:0;z-index:5000;display:grid;place-items:center;background:#0b0a0a;cursor:pointer;
+        animation:nki-fuera .6s ease-in 5.7s forwards}
+      #nk-intro.is-fuera{animation:nki-fuera .35s ease-in forwards}
+      #nk-intro .nki-brillo{position:absolute;left:50%;top:50%;width:70vmax;height:70vmax;margin:-35vmax 0 0 -35vmax;border-radius:50%;opacity:0;
+        background:radial-gradient(circle,rgba(252,255,164,.2),rgba(252,165,10,.14) 25%,rgba(221,81,58,.08) 45%,rgba(181,54,122,.05) 60%,transparent 70%);
+        transform:scale(.3);will-change:transform,opacity;animation:nki-brillo 3.8s ease-out 1.5s forwards}
+      /* Entrada: el logo llega desde atrás (escala y desplazamiento) mientras un barrido de luz cruza la pantalla. */
+      #nk-intro .nki-logo{position:relative;width:min(72vw,560px);aspect-ratio:507/190;transform-origin:13.8% 50%;will-change:transform,opacity;
+        animation:nki-entra 1s cubic-bezier(.16,1,.3,1) both,nki-zoom 1s cubic-bezier(.7,0,.84,0) 4.8s forwards}
+      #nk-intro .nki-barrido{position:absolute;left:0;right:0;top:50%;height:2px;margin-top:-1px;opacity:0;transform:scaleX(0);will-change:transform,opacity;
+        background:linear-gradient(90deg,transparent,rgba(181,54,122,.7),rgba(252,165,10,.95),rgba(252,255,164,1),rgba(252,165,10,.95),rgba(181,54,122,.7),transparent);
+        animation:nki-barrido 1.1s cubic-bezier(.22,1,.36,1) .05s forwards}
+      @keyframes nki-entra{from{opacity:0;transform:translateY(18px) scale(.82)}to{opacity:1;transform:none}}
+      @keyframes nki-barrido{0%{opacity:0;transform:scaleX(0)}25%{opacity:1}60%{opacity:.9;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1) scaleY(18)}}
+      #nk-intro .nki-px{position:absolute;width:3.945%;height:10.526%;border-radius:20%;opacity:0;transform:translateY(40%) scale(0);
+        transform-origin:50% 100%;will-change:transform,opacity;
+        animation:nki-pop .38s cubic-bezier(.34,1.56,.64,1) var(--d1) forwards,nki-vivo .7s ease-in-out var(--d2) 4 alternate}
+      #nk-intro .nki-chispa{position:absolute;width:2.2%;aspect-ratio:1;border-radius:22%;opacity:0;will-change:transform,opacity;
+        animation:nki-chispa 1.15s cubic-bezier(.2,.6,.4,1) var(--d1) forwards}
+      #nk-intro .nki-texto{position:absolute;left:33%;top:0;width:67%;height:100%;overflow:hidden}
+      #nk-intro .nki-texto img{position:absolute;top:0;left:-49.254%;width:149.254%;height:100%;opacity:0;transform:translateX(-12%);
+        will-change:transform,opacity;animation:nki-texto .7s cubic-bezier(.22,1,.36,1) 1.5s forwards}
+      @keyframes nki-pop{to{opacity:1;transform:none}}
+      @keyframes nki-vivo{from{transform:none}to{transform:translateY(var(--a)) scaleY(1.1)}}
+      @keyframes nki-chispa{0%{opacity:0;transform:none}15%{opacity:1}100%{opacity:0;transform:translate(40%,-260%) scale(.35)}}
+      @keyframes nki-texto{to{opacity:1;transform:none}}
+      @keyframes nki-brillo{25%{opacity:1;transform:scale(1)}50%{opacity:.7}70%{opacity:1}100%{opacity:.6;transform:scale(1.2)}}
+      @keyframes nki-zoom{0%{transform:none;opacity:1}70%{opacity:1}100%{transform:scale(22);opacity:0}}
+      @keyframes nki-fuera{to{opacity:0;visibility:hidden;pointer-events:none}}
+      @media (prefers-reduced-motion:reduce){
+        #nk-intro{animation:nki-fuera .4s ease-in .9s forwards}
+        #nk-intro .nki-brillo,#nk-intro .nki-chispa,#nk-intro .nki-barrido{display:none}
+        #nk-intro .nki-logo,#nk-intro .nki-px,#nk-intro .nki-texto img{animation:none;opacity:1;transform:none}
+      }
+    </style>
+  </head>
+  <body>
+    <div id="nk-intro" aria-hidden="true"><div class="nki-brillo"></div><div class="nki-barrido"></div><div class="nki-logo"><div class="nki-texto"><img src="./nikal-icono.svg" alt=""></div></div></div>
+    <script>
+      // Apertura de marca: arma los 24 píxeles de la llama del logo (de abajo hacia arriba), las chispas y la
+      // quita al terminar. ?intro=0 o ?diseno=dante la omiten; clic o cualquier tecla la saltan.
+      (function () {
+        var el = document.getElementById('nk-intro')
+        if (!el) return
+        var q = new URLSearchParams(location.search)
+        if (q.get('intro') === '0' || q.get('diseno') === 'dante') { el.remove(); return }
+        var P = [[50,0,'#b5367a'],[25,25,'#b5367a'],[50,25,'#dd513a'],[25,50,'#b5367a'],[50,50,'#fca50a'],[75,50,'#dd513a'],[0,75,'#b5367a'],[25,75,'#dd513a'],[50,75,'#fca50a'],[75,75,'#fca50a'],[100,75,'#b5367a'],[0,100,'#b5367a'],[25,100,'#fca50a'],[50,100,'#fcffa4'],[75,100,'#fca50a'],[100,100,'#dd513a'],[0,125,'#dd513a'],[25,125,'#fca50a'],[50,125,'#fcffa4'],[75,125,'#fcffa4'],[100,125,'#dd513a'],[25,150,'#dd513a'],[50,150,'#fca50a'],[75,150,'#dd513a']]
+        var logo = el.querySelector('.nki-logo')
+        P.slice().sort(function (a, b) { return b[1] - a[1] || a[0] - b[0] }).forEach(function (p, k) {
+          var d = document.createElement('i')
+          d.className = 'nki-px'
+          d.style.left = ((p[0] + 10) / 507 * 100) + '%'
+          d.style.top = ((p[1] + 10) / 190 * 100) + '%'
+          d.style.background = p[2]
+          d.style.setProperty('--d1', (0.4 + k * 0.045) + 's')
+          d.style.setProperty('--d2', (1.9 + ((p[0] / 25 + p[1] / 25) % 5) * 0.12) + 's')
+          d.style.setProperty('--a', (-(4 + (170 - p[1]) / 170 * 14)) + '%')
+          logo.appendChild(d)
+        });
+        [[57, 2.2, '#fcffa4'], [33, 2.65, '#fca50a'], [83, 3.0, '#fcffa4'], [60, 3.45, '#fca50a'], [45, 3.8, '#fcffa4'], [72, 4.15, '#dd513a']].forEach(function (c) {
+          var s = document.createElement('b')
+          s.className = 'nki-chispa'
+          s.style.left = ((c[0] + 10) / 507 * 100) + '%'
+          s.style.top = (6 / 190 * 100) + '%'
+          s.style.background = c[2]
+          s.style.setProperty('--d1', c[1] + 's')
+          logo.appendChild(s)
+        })
+        var hecho = false
+        function quitar(rapido) {
+          if (hecho) return
+          hecho = true
+          if (rapido) el.classList.add('is-fuera')
+          setTimeout(function () { if (el.parentNode) el.remove() }, rapido ? 380 : 50)
+        }
+        var reducido = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches
+        setTimeout(function () { quitar(false) }, reducido ? 1350 : 6350)
+        el.addEventListener('click', function () { quitar(true) })
+        window.addEventListener('keydown', function () { quitar(true) }, { once: true })
+      })()
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+# Construye la imagen de Nikal en Google Cloud Build (sin usar Docker ni memoria en tu PC).
+# Desde la RAÍZ del repositorio:
+#   gcloud builds submit --config plataforma_local/cloudbuild.yaml \
+#     --substitutions _IMAGE=southamerica-east1-docker.pkg.dev/sonic-mile-514718-r5/firecal/firecal-cusco:<etiqueta> .
+# Luego: gcloud run deploy firecal --image <la misma imagen> --region southamerica-east1
+# También sirve para un activador automático de Cloud Build.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    env: ["DOCKER_BUILDKIT=1"]          # necesario para Dockerfile.dockerignore y COPY --from
+    args: ["build", "-f", "plataforma_local/Dockerfile", "-t", "${_IMAGE}", "."]
+images: ["${_IMAGE}"]
+substitutions:
+  _IMAGE: southamerica-east1-docker.pkg.dev/sonic-mile-514718-r5/firecal/firecal-cusco:latest
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1200s

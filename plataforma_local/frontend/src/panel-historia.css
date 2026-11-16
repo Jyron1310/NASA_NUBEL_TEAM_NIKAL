@@ -1,0 +1,47 @@
+/* Panel "Entender" (PanelHistoria.jsx). Diseño según PROMPT_PANEL_NIKAL.md: drawer oscuro de una columna sobre el
+   mapa (hoja inferior en móvil), titular con cifras resaltadas, títulos que afirman el hallazgo, año en #fca50a y lo
+   habitual en gris punteado. Todos los valores de diseño están en estos tokens. */
+.nk{
+  --ph-bg:rgba(18,16,17,.95); --ph-linea:rgba(245,243,238,.11); --ph-texto:#f5f3ee; --ph-texto2:#a8a297;
+  --ph-anio:#fca50a; --ph-habitual:#bdb7ad; --ph-marca:rgba(252,165,10,.38);
+  --ph-ancho:480px; --ph-s1:4px; --ph-s2:8px; --ph-s3:16px; --ph-s4:22px;
+  --ph-t-lead:19px; --ph-t-h3:15px; --ph-t-sub:12px; --ph-t-pie:11px;
+  --ph-titulo:'Nikal Grotesk','Segoe UI',system-ui,sans-serif; --ph-cuerpo:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+.ph-panel{position:absolute;z-index:700;right:96px;top:78px;bottom:172px;width:var(--ph-ancho);display:flex;flex-direction:column;
+  background:var(--ph-bg);border:1px solid var(--ph-linea);border-radius:14px;backdrop-filter:blur(14px);box-shadow:var(--nk-hard);
+  color:var(--ph-texto);font-family:var(--ph-cuerpo);font-variant-numeric:tabular-nums;overflow:hidden}
+.ph-asa{display:none}
+.ph-body{flex:1;overflow:auto;padding:var(--ph-s4) var(--ph-s4) var(--ph-s4);scrollbar-width:thin;scrollbar-color:rgba(245,243,238,.2) transparent}
+.ph-lugar{margin:0 0 var(--ph-s2);font:600 var(--ph-t-sub) var(--ph-titulo);color:var(--ph-texto2)}
+.ph-lead{margin:0;font:500 var(--ph-t-lead)/1.42 var(--ph-titulo);letter-spacing:-.01em;color:var(--ph-texto);text-wrap:pretty}
+.ph-lead b{font-weight:700;color:#fff;background:linear-gradient(transparent 60%,var(--ph-marca) 60%);padding:0 1px}
+.ph-cautela{margin:var(--ph-s2) 0 0;font-size:var(--ph-t-sub);color:#fcffa4}
+.ph-cap{margin-top:var(--ph-s4);padding-top:var(--ph-s3);border-top:1px solid var(--ph-linea)}
+.ph-cap header{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--ph-s3)}
+.ph-cap h3{margin:0;font:700 var(--ph-t-h3)/1.3 var(--ph-titulo);letter-spacing:-.01em;color:var(--ph-texto);text-wrap:balance}
+.ph-cap header p{margin:var(--ph-s1) 0 var(--ph-s2);font-size:var(--ph-t-sub);line-height:1.42;color:var(--ph-texto2)}
+.ph-cap.is-chico h3{font-size:13px}
+.ph-svg{display:block;width:100%;height:auto;border-radius:6px}
+.ph-anio{flex:none;padding:3px 6px;border:1px solid var(--ph-linea);border-radius:6px;background:#1f1b1c;color:var(--ph-texto);font:600 12px var(--ph-titulo);font-variant-numeric:tabular-nums;cursor:pointer}
+.ph-pie{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:var(--ph-s2);font-size:var(--ph-t-pie);color:var(--ph-texto2)}
+.ph-pie>span:first-child{flex:1}
+.ph-ico{width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--ph-linea);border-radius:6px;background:transparent;color:var(--ph-texto2);cursor:pointer}
+.ph-ico:hover,.ph-ico[aria-expanded="true"]{color:var(--ph-texto);border-color:var(--ph-anio)}
+.ph-menu{position:relative}
+.ph-menu-list{position:absolute;z-index:3;right:0;bottom:36px;min-width:140px;display:flex;flex-direction:column;padding:4px;background:#f5f3ee;color:#141210;border:1.5px solid #141210;border-radius:8px;box-shadow:3px 3px 0 #b5367a}
+.ph-menu-list button{padding:8px 10px;border:0;border-radius:5px;background:transparent;color:inherit;font:500 12px var(--ph-cuerpo);text-align:left;cursor:pointer}
+.ph-menu-list button:hover{background:#e6e2d9}
+.ph-nota{flex-basis:100%;margin:var(--ph-s1) 0 0;padding:var(--ph-s2) 10px;border-radius:6px;background:rgba(245,243,238,.06);font-size:var(--ph-t-sub);line-height:1.45;color:var(--ph-texto)}
+.ph-error{margin:0;color:#ffb4a8;font-size:13px}
+.fw-app.is-live .ph-panel{display:none!important}
+
+@media(max-width:950px){.ph-panel{width:min(var(--ph-ancho),calc(100vw - 190px))}}
+/* Móvil: hoja inferior que tapa la cinta mientras está abierta; el mapa sigue visible arriba. */
+@media(max-width:650px){
+  .ph-panel{left:0;right:0;bottom:0;top:max(292px,40dvh);width:auto;z-index:760;border-radius:16px 16px 0 0;border-bottom:0}
+  .ph-asa{display:block;flex:none;width:40px;height:4px;margin:8px auto 0;border-radius:2px;background:rgba(245,243,238,.3)}
+  .ph-body{padding:var(--ph-s2) var(--ph-s3) var(--ph-s4)}
+  .nk{--ph-t-lead:16px;--ph-t-h3:14px}
+  .nk:has(.ph-panel) .nk-ribbon,.nk:has(.ph-panel) .fw-display-dock{visibility:hidden}
+}

@@ -1,0 +1,22 @@
+# Valida los CSV armonizados en cada cambio de datos o de scripts.
+name: verificar-datos
+on:
+  push:
+    paths: ["data/harmonized/**", "harmonizacion/**", ".github/workflows/verificar-datos.yml"]
+  pull_request:
+    paths: ["data/harmonized/**", "harmonizacion/**", ".github/workflows/verificar-datos.yml"]
+permissions:
+  contents: read
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install numpy==2.4.4 pandas==2.3.3
+      - run: >
+          python -I harmonizacion/verificar_datos.py
+          data/harmonized/harmonizado_cusco_celda_dia.csv
+          data/harmonized/focos_cusco_individuales.csv

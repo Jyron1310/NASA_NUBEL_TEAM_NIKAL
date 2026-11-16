@@ -1,0 +1,226 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#081722;overflow:hidden}canvas{display:block}</style>
+<script src="data.js"></script>
+</head><body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, ctx = document.getElementById('c').getContext('2d')
+const BG = '#081722', INK = '#f2f6f8', MUTED = '#8fa6b4', TEAL = '#2ec4b6', ORANGE = '#fd8d3c', RED = '#e8452c', BLUE = '#4ea8de'
+const RAMP = ['#ffffb2', '#fecc5c', '#fd8d3c', '#f03b20', '#bd0026']
+const F = (w, s) => `${w} ${s}px Inter, 'DejaVu Sans', sans-serif`
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x))
+const ease = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2 }
+// opacidad de una escena: entra en [a, a+0.5] y sale en [b-0.5, b]
+const vis = (t, a, b, f = 0.5) => clamp((t - a) / f) * clamp((b - t) / f)
+const lerp = (a, b, x) => a + (b - a) * x
+
+function text(s, x, y, size, color = INK, weight = 600, align = 'left', alpha = 1) {
+  ctx.globalAlpha = alpha; ctx.fillStyle = color; ctx.font = F(weight, size); ctx.textAlign = align; ctx.textBaseline = 'alphabetic'
+  ctx.fillText(s, x, y); ctx.globalAlpha = 1
+}
+function rrect(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r) }
+function color(v, cuts) { if (!v) return '#16303f'; let i = 0; for (const c of cuts) if (v > c) i++; return RAMP[Math.min(i, 4)] }
+
+// fondo con rejilla sutil
+function background(t) {
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H)
+  ctx.strokeStyle = 'rgba(78,168,222,0.06)'; ctx.lineWidth = 1
+  const off = (t * 12) % 60
+  for (let x = -60 + off; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke() }
+  for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke() }
+}
+function brand(t) {
+  const a = t > 0.3 && t < 26 ? 1 : 0
+  if (!a) return
+  text('NIKAL', 70, 70, 26, INK, 800, 'left', 0.9)
+  text('Focos de calor · Cusco 2000–2025', 168, 70, 20, MUTED, 500, 'left', 0.9)
+}
+function caption(s, alpha) {
+  if (alpha <= 0) return
+  ctx.globalAlpha = alpha * 0.92; ctx.fillStyle = '#0f2a3a'; rrect(W / 2 - 760, H - 132, 1520, 76, 18); ctx.fill(); ctx.globalAlpha = 1
+  text(s, W / 2, H - 82, 32, INK, 600, 'center', alpha)
+}
+
+// ---------- Escena 1: título (0–4 s)
+function s1(t) {
+  const a = vis(t, 0, 4)
+  if (a <= 0) return
+  // anillo de "pulso" satelital
+  for (let i = 0; i < 3; i++) {
+    const p = ((t * 0.6 + i / 3) % 1)
+    ctx.strokeStyle = `rgba(253,141,60,${(1 - p) * 0.5 * a})`; ctx.lineWidth = 3
+    ctx.beginPath(); ctx.arc(W / 2, 430, 60 + p * 260, 0, Math.PI * 2); ctx.stroke()
+  }
+  ctx.globalAlpha = a; ctx.fillStyle = ORANGE; ctx.beginPath(); ctx.arc(W / 2, 430, 18, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1
+  const y = lerp(40, 0, ease((t - 0.2) / 0.8))
+  text('NIKAL', W / 2, 640 + y, 150, INK, 800, 'center', a)
+  text('25 años de focos de calor en Cusco, medidos con una sola regla', W / 2, 720 + y, 40, MUTED, 500, 'center', a * clamp((t - 0.8) / 0.6))
+  text('Datos satelitales de NASA FIRMS · MODIS + VIIRS', W / 2, 785 + y, 28, TEAL, 600, 'center', a * clamp((t - 1.3) / 0.6))
+}
+
+// ---------- Escena 2: dos satélites, dos píxeles (4–9 s)
+function s2(t) {
+  const a = vis(t, 4, 9)
+  if (a <= 0) return
+  const lt = t - 4
+  const box = (cx, label, sub, px, n, col, delay) => {
+    const p = ease((lt - delay) / 0.8)
+    text(label, cx, 250, 46, INK, 800, 'center', a * p)
+    text(sub, cx, 298, 28, MUTED, 500, 'center', a * p)
+    // un mismo terreno de 1 km² visto por cada sensor
+    const S = 380, x0 = cx - S / 2, y0 = 350
+    ctx.globalAlpha = a * p; ctx.fillStyle = '#123247'; ctx.fillRect(x0, y0, S, S)
+    // la mancha de calor (igual en ambos)
+    const g = ctx.createRadialGradient(x0 + S * 0.55, y0 + S * 0.45, 5, x0 + S * 0.55, y0 + S * 0.45, S * 0.28)
+    g.addColorStop(0, 'rgba(240,59,32,0.9)'); g.addColorStop(1, 'rgba(240,59,32,0)')
+    ctx.fillStyle = g; ctx.fillRect(x0, y0, S, S)
+    // rejilla de píxeles
+    const cell = S / n
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const cxp = x0 + (i + 0.5) * cell, cyp = y0 + (j + 0.5) * cell
+      const d = Math.hypot(cxp - (x0 + S * 0.55), cyp - (y0 + S * 0.45))
+      const hot = d < S * 0.2
+      const on = hot && lt > delay + 1.2
+      if (on) { ctx.fillStyle = col; ctx.globalAlpha = a * 0.55 * clamp((lt - delay - 1.2) / 0.5); ctx.fillRect(x0 + i * cell + 2, y0 + j * cell + 2, cell - 4, cell - 4) }
+      ctx.globalAlpha = a * p; ctx.strokeStyle = 'rgba(242,246,248,0.55)'; ctx.lineWidth = 2; ctx.strokeRect(x0 + i * cell, y0 + j * cell, cell, cell)
+    }
+    ctx.globalAlpha = 1
+    text(px, cx, 790, 30, col, 700, 'center', a * p)
+  }
+  box(560, 'MODIS', '2000 – 2012', 'Píxel de 1 km', 1, ORANGE, 0.1)
+  box(1360, 'VIIRS', 'desde 2013', 'Píxel de 375 m', 3, RED, 0.5)
+  caption('VIIRS es más sensible: en el mismo lugar marca 3 a 4 veces más celdas con foco de calor', a * clamp((lt - 1.8) / 0.5))
+}
+
+// ---------- Escena 3: salto falso y armonización (9–16 s)
+function s3(t) {
+  const a = vis(t, 9, 16)
+  if (a <= 0) return
+  const lt = t - 9
+  const D = window.D, n = D.years.length
+  const x0 = 220, x1 = 1700, yB = 860, hMax = 560
+  const max = Math.max(...D.raw)
+  const morph = ease((lt - 3.2) / 1.4)              // crudo -> armonizado
+  const grow = ease(lt / 1.4)
+  // ejes
+  ctx.globalAlpha = a; ctx.strokeStyle = 'rgba(242,246,248,0.35)'; ctx.lineWidth = 2
+  ctx.beginPath(); ctx.moveTo(x0 - 20, yB); ctx.lineTo(x1 + 20, yB); ctx.stroke(); ctx.globalAlpha = 1
+  const bw = (x1 - x0) / n
+  for (let i = 0; i < n; i++) {
+    const y = D.years[i]
+    const v = lerp(D.raw[i], D.harm[i], y >= 2013 ? morph : 0)
+    const h = v / max * hMax * grow
+    const viirs = y >= 2013
+    ctx.globalAlpha = a
+    ctx.fillStyle = viirs ? (morph > 0.5 ? TEAL : RED) : ORANGE
+    rrect(x0 + i * bw + 6, yB - h, bw - 12, h, 6); ctx.fill()
+    if (y % 4 === 1 || y === 2013) text(String(y), x0 + (i + 0.5) * bw, yB + 38, 22, y === 2013 ? INK : MUTED, y === 2013 ? 800 : 500, 'center', a)
+  }
+  ctx.globalAlpha = 1
+  // línea del cambio de satélite
+  const i13 = D.years.indexOf(2013), xs = x0 + i13 * bw
+  ctx.globalAlpha = a * clamp((lt - 0.8) / 0.4); ctx.setLineDash([10, 8]); ctx.strokeStyle = INK; ctx.lineWidth = 2
+  ctx.beginPath(); ctx.moveTo(xs, 230); ctx.lineTo(xs, yB); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1
+  text('cambio de satélite', xs + 14, 250, 24, MUTED, 600, 'left', a * clamp((lt - 0.8) / 0.4))
+  // títulos que cambian
+  const t1 = a * clamp((lt - 0.3) / 0.4) * (1 - morph), t2 = a * morph
+  text('Datos crudos: en 2013 los focos de calor "se duplican"', W / 2, 180, 44, RED, 800, 'center', t1)
+  text('Serie armonizada: VIIRS × k, en la escala de MODIS', W / 2, 180, 44, TEAL, 800, 'center', t2)
+  // marca del salto
+  if (morph < 0.95) {
+    const r = D.raw[i13 - 1], q = D.raw[i13]
+    text(`2012: ${r.toLocaleString('es-PE')}  →  2013: ${q.toLocaleString('es-PE')} celdas-día`, xs + 14, 292, 28, RED, 800, 'left', a * clamp((lt - 1.2) / 0.4) * (1 - morph))
+  }
+  caption(morph < 0.5 ? 'No hubo más focos de calor: solo cambió el satélite' : 'Calibrado y validado: error anual mediano 6 % (k = 0,330 / 0,247 por altitud)', a * clamp((lt - 1.4) / 0.5))
+}
+
+// ---------- Escena 4: el mapa (16–21 s)
+function s4(t) {
+  const a = vis(t, 16, 21)
+  if (a <= 0) return
+  const lt = t - 16, D = window.D
+  // proyección simple sobre la caja de Cusco
+  const lon0 = -74.05, lon1 = -70.3, lat0 = -15.3, lat1 = -11.15
+  const sc = 720 / (lat1 - lat0), cx = 1180, cy = 540
+  const P = (lo, la) => [cx + (lo - (lon0 + lon1) / 2) * sc * Math.cos(13.5 * Math.PI / 180), cy - (la - (lat0 + lat1) / 2) * sc]
+  ctx.globalAlpha = a
+  ctx.fillStyle = '#10293a'; ctx.strokeStyle = TEAL; ctx.lineWidth = 3
+  for (const ring of D.rings) {
+    ctx.beginPath(); ring.forEach(([lo, la], i) => { const [x, y] = P(lo, la); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y) }); ctx.closePath(); ctx.fill(); ctx.stroke()
+  }
+  const mes = clamp(Math.floor(lt / 3.6 * 12) + 1, 1, 12)
+  for (const [lo, la, m] of D.pts) {
+    if (m > mes) continue
+    const [x, y] = P(lo, la)
+    ctx.fillStyle = m === mes ? '#ffd166' : 'rgba(240,59,32,0.55)'
+    ctx.fillRect(x - 2, y - 2, 4, 4)
+  }
+  ctx.globalAlpha = 1
+  const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+  text('2020', 170, 380, 110, INK, 800, 'left', a)
+  text(meses[mes - 1], 175, 450, 46, ORANGE, 700, 'left', a)
+  const acum = D.mon[2020 - 2001].slice(0, mes).reduce((s, v) => s + v, 0)
+  text(Math.round(acum).toLocaleString('es'), 170, 580, 90, INK, 800, 'left', a)
+  text('focos de calor armonizados', 175, 625, 30, MUTED, 600, 'left', a)
+  text('acumulados en el año', 175, 662, 30, MUTED, 600, 'left', a)
+  caption('Cada punto es una detección satelital: el centro de un píxel, no un incendio confirmado', a * clamp((lt - 0.6) / 0.5))
+}
+
+// ---------- Escena 5: calendario y herramientas (21–26 s)
+function s5(t) {
+  const a = vis(t, 21, 26)
+  if (a <= 0) return
+  const lt = t - 21, D = window.D
+  const vals = D.mon.flat().filter((v) => v > 0).sort((x, y) => x - y)
+  const q = (p) => vals[Math.floor(p * (vals.length - 1))]
+  const cuts = [q(0.5), q(0.75), q(0.9), q(0.99)]
+  const x0 = 150, y0 = 210, cw = 46, ch = 26
+  text('Calendario mes × año', x0, y0 - 30, 34, INK, 800, 'left', a)
+  'EFMAMJJASOND'.split('').forEach((m, i) => text(m, x0 + 70 + i * cw + cw / 2, y0 + 4, 20, MUTED, 600, 'center', a))
+  for (let r = 0; r < 25; r++) {
+    const p = clamp((lt * 9 - r) / 3)
+    if (p <= 0) continue
+    const y = y0 + 16 + r * ch
+    if (r % 4 === 0) text(String(2001 + r), x0 + 56, y + 19, 18, MUTED, 500, 'right', a * p)
+    for (let m = 0; m < 12; m++) {
+      ctx.globalAlpha = a * p; ctx.fillStyle = color(D.mon[r][m], cuts)
+      rrect(x0 + 70 + m * cw + 2, y + 2, cw - 4, ch - 4, 4); ctx.fill()
+    }
+  }
+  ctx.globalAlpha = 1
+  const cards = [
+    ['Anomalía', '¿Este mes fue normal o fuera de lo común?', ORANGE],
+    ['Nivel de peligro', 'Por provincia, distrito y cuenca (formato CENEPRED)', RED],
+    ['Informe técnico', 'De cualquier área y periodo, listo para imprimir', TEAL],
+    ['En vivo', 'Detecciones de las últimas 24 h a 5 días', BLUE],
+  ]
+  cards.forEach(([h, s, c], i) => {
+    const p = ease((lt - 0.6 - i * 0.45) / 0.5)
+    const x = 900 + (1 - p) * 60, y = 210 + i * 165
+    ctx.globalAlpha = a * p; ctx.fillStyle = '#0f2a3a'; rrect(x, y, 870, 140, 20); ctx.fill()
+    ctx.fillStyle = c; rrect(x, y, 12, 140, 6); ctx.fill(); ctx.globalAlpha = 1
+    text(h, x + 44, y + 60, 40, INK, 800, 'left', a * p)
+    text(s, x + 44, y + 106, 28, MUTED, 500, 'left', a * p)
+  })
+  caption('Para decidir: dónde, cuándo y si este año es distinto a lo típico', a * clamp((lt - 2.6) / 0.5))
+}
+
+// ---------- Escena 6: cierre (26–30 s)
+function s6(t) {
+  const a = clamp((t - 26) / 0.6)
+  if (a <= 0) return
+  text('NIKAL', W / 2, 420, 130, INK, 800, 'center', a)
+  text('Una serie de 25 años, comparable y verificable, para la gestión del territorio en Cusco', W / 2, 500, 36, MUTED, 500, 'center', a)
+  ctx.globalAlpha = a * 0.9; ctx.fillStyle = '#0f2a3a'; rrect(W / 2 - 640, 570, 1280, 110, 20); ctx.fill(); ctx.globalAlpha = 1
+  text('Un foco de calor es una señal de calor vista desde el espacio:', W / 2, 615, 30, INK, 600, 'center', a)
+  text('no es un incendio confirmado ni mide el área quemada.', W / 2, 657, 30, INK, 600, 'center', a)
+  text('Nubel Team · NASA Space Apps Challenge 2026', W / 2, 800, 32, TEAL, 700, 'center', a * clamp((t - 26.6) / 0.5))
+  text("Datos: NASA FIRMS (MODIS y VIIRS). We acknowledge the use of data from NASA's FIRMS.", W / 2, 850, 22, MUTED, 500, 'center', a * clamp((t - 26.6) / 0.5))
+}
+
+window.render = (t) => {
+  ctx.clearRect(0, 0, W, H); background(t); brand(t)
+  s1(t); s2(t); s3(t); s4(t); s5(t); s6(t)
+}
+window.render(0)
+</script></body></html>

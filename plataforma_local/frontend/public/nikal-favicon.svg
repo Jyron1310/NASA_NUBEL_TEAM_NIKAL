@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -5 180 180" role="img" aria-label="Nikal"><g fill="#B5367A">
+<rect x="50" y="0" width="20" height="20" rx="4"/><rect x="25" y="25" width="20" height="20" rx="4"/><rect x="25" y="50" width="20" height="20" rx="4"/><rect x="0" y="75" width="20" height="20" rx="4"/><rect x="100" y="75" width="20" height="20" rx="4"/><rect x="0" y="100" width="20" height="20" rx="4"/>
+</g><g fill="#DD513A">
+<rect x="50" y="25" width="20" height="20" rx="4"/><rect x="75" y="50" width="20" height="20" rx="4"/><rect x="25" y="75" width="20" height="20" rx="4"/><rect x="100" y="100" width="20" height="20" rx="4"/><rect x="0" y="125" width="20" height="20" rx="4"/><rect x="100" y="125" width="20" height="20" rx="4"/><rect x="25" y="150" width="20" height="20" rx="4"/><rect x="75" y="150" width="20" height="20" rx="4"/>
+</g><g fill="#FCA50A">
+<rect x="50" y="50" width="20" height="20" rx="4"/><rect x="50" y="75" width="20" height="20" rx="4"/><rect x="75" y="75" width="20" height="20" rx="4"/><rect x="25" y="100" width="20" height="20" rx="4"/><rect x="75" y="100" width="20" height="20" rx="4"/><rect x="25" y="125" width="20" height="20" rx="4"/><rect x="50" y="150" width="20" height="20" rx="4"/>
+</g><g fill="#FCFFA4">
+<rect x="50" y="100" width="20" height="20" rx="4"/><rect x="50" y="125" width="20" height="20" rx="4"/><rect x="75" y="125" width="20" height="20" rx="4"/>
+</g></svg>

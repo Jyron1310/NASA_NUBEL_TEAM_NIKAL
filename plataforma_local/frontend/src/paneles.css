@@ -1,0 +1,89 @@
+/* Estilo del panel "Entender" (panel-historia.css) llevado a los demás paneles: Datos, Ámbitos, Calendario,
+   Comparar, área dibujada, Capas, aviso de dibujo y En vivo. Mismo fondo oscuro, texto claro, títulos en Space
+   Grotesk, rótulos como subtítulos grises (sin mayúsculas), controles oscuros y estado activo en ichu.
+   Los colores de datos (niveles CENEPRED, escala del calendario, insignias, En vivo) no se tocan. */
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel,.fw-layers,.fw-draw-hint){
+  background:var(--ph-bg)!important;color:var(--ph-texto)!important;border:1px solid var(--ph-linea)!important;
+  border-radius:14px!important;box-shadow:var(--nk-hard)!important;backdrop-filter:blur(14px);
+  font-family:var(--ph-cuerpo);font-variant-numeric:tabular-nums;color-scheme:dark}
+
+/* superficies internas: sin fondos claros (los fondos con color de dato van en línea y se respetan) */
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel,.fw-layers)
+  :is(div,section,article,header,footer,form,ol,ul,li,dl,dd,dt,table,thead,tbody,tr,th,p,label,fieldset):not([style*="background"]){
+  background-color:transparent!important;background-image:none!important}
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel,.fw-layers) *{border-color:var(--ph-linea)!important}
+
+/* texto: claro; secundario en gris (contraste ≥ 4.5:1 sobre el fondo) */
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel,.fw-layers,.fw-draw-hint)
+  :is(p,span,label,dt,dd,li,th,td,strong,b,em,h1,h2,h3,h4,a,legend,figcaption,article,div):not(.fw-risk):not(.fw-risk *):not(.fa-badge):not(.fa-dias-tip):not(.fa-dias-tip *):not(.ph-menu-list *){
+  color:var(--ph-texto)}
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel,.fw-layers,.fw-draw-hint)
+  :is(small,label,.fa-note,.fc-live-msg,.fw-selection-source span,.fw-summary-head span,.fw-summary-status>span:last-child,.fc-compare-notes,.fc-compare-footer,.fa-dias-ctrl label){
+  color:var(--ph-texto2)!important}
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel,.fw-layers,.fw-draw-hint) :is(h1,h2,h3,h4){
+  font-family:var(--ph-titulo)!important;letter-spacing:-.01em!important;text-transform:none!important;color:var(--ph-texto)!important}
+
+/* rótulos superiores ("eyebrows") → subtítulo gris debajo del título, en minúsculas normales */
+.nk :is(.fw-summary-head,.fa-head,.fc-calendar-head,.fw-selection-head)>div:first-child{display:flex;flex-direction:column}
+.nk :is(.fw-summary-head,.fa-head,.fc-calendar-head,.fw-selection-head)>div:first-child>p{order:2;margin:4px 0 0!important;
+  font:400 var(--ph-t-sub) var(--ph-cuerpo)!important;letter-spacing:0!important;text-transform:none!important;color:var(--ph-texto2)!important}
+.nk .fw-summary-head h1{font-size:19px!important}
+.nk :is(.fa-head,.fc-calendar-head,.fw-selection-head) h2{font-size:15px!important;margin:0!important}
+.nk .fc-live-panel header p{font:600 13px var(--ph-titulo)!important;letter-spacing:0!important;text-transform:none!important}
+
+/* controles */
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel) :is(input,select,textarea){
+  background:#1f1b1c!important;color:var(--ph-texto)!important;border:1px solid var(--ph-linea)!important;border-radius:6px!important}
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel,.fw-layers,.fw-draw-hint)
+  :where(button,a.fa-btn):where(:not(.fc-filter-apply):not(.ph-ico)){
+  background:transparent!important;color:var(--ph-texto)!important;border:1px solid var(--ph-linea)!important;border-radius:7px!important;box-shadow:none!important}
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel,.fw-layers,.fw-draw-hint)
+  :where(button,a.fa-btn):where(:not(.fc-filter-apply):not(:disabled)):hover{border-color:var(--ph-anio)!important}
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel,.fw-layers)
+  :is(button.is-active,button[aria-pressed="true"],.fw-layer-button.is-active){
+  background:var(--ph-anio)!important;color:#141210!important;border-color:#141210!important;box-shadow:2px 2px 0 #b5367a!important}
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel,.fw-layers)
+  :is(button.is-active,button[aria-pressed="true"],.fw-layer-button.is-active) *{color:#141210!important}
+.nk .fc-filter-apply{background:var(--ph-anio)!important;color:#141210!important;border:2px solid #141210!important;box-shadow:3px 3px 0 #b5367a!important}
+.nk .fc-filter-apply *{color:#141210!important}
+
+/* detalles por panel */
+.nk .fw-metric>span{background:rgba(245,243,238,.07)!important}
+.nk .fw-metric .red{color:#ff8a70!important}.nk .fw-metric .orange{color:#bdb7ad!important}
+.nk .fw-metric .green{color:#fca50a!important}.nk .fw-metric .blue{color:var(--ph-texto)!important}
+.nk .fw-metric b{font-family:var(--ph-titulo);font-size:15px}
+.nk .fa-list li.is-picked{background:rgba(252,165,10,.12)!important}
+.nk .fa-list li:hover{background:rgba(245,243,238,.05)!important}
+.nk .fa-badge{color:#fff!important}
+.nk .fc-calendar th{background:#121011!important}
+.nk .fc-calendar td.is-nodata{background:#2a2526 repeating-linear-gradient(-45deg,rgba(245,243,238,.16) 0 2px,transparent 2px 6px)!important}
+.nk .fc-live-panel h3{font-size:22px!important}
+.nk .fc-notice,.nk .fc-margin{color:var(--ph-texto2)!important}
+
+/* gráfico por día del año dentro de Ámbitos, sobre fondo oscuro */
+.nk .fa-dias{border-color:var(--ph-linea)!important}
+.nk .fa-dias-grid{stroke:rgba(245,243,238,.12)}
+.nk .fa-dias-eje{fill:#a8a297}
+.nk .fa-dias-cursor{stroke:#f5f3ee}
+.nk .fa-dias-fijo{stroke:var(--ph-anio);stroke-width:2}
+.nk .fa-dias-ventana{fill:rgba(252,165,10,.14)}
+.nk .fa-dias-mapa{background:rgba(245,243,238,.06)!important}
+.nk .fa-dias-mapa>div b{color:var(--ph-anio)!important}
+.nk .fa-dias-lead{color:#f5f3ee!important}
+.fa-period{margin-top:4px;padding:10px;border:1px solid var(--line);border-radius:8px}.fa-period>strong{display:flex;align-items:center;gap:7px;font-size:11px}.fa-period>div{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.fa-period>small{display:block;margin-top:6px}.fa-period-error{color:#ff8a70!important}.fa-report-buttons button{justify-content:center}.fa-report-primary{background:var(--ph-anio)!important;color:#141210!important}.fa-report-loading{margin-top:8px;display:flex!important;grid-column:1/-1;align-items:center;justify-content:center;gap:7px;color:#f5f3ee}.fa-report-loading svg{animation:fa-spin .8s linear infinite}@keyframes fa-spin{to{transform:rotate(360deg)}}.fa-actions{display:flex;align-items:center;gap:8px}.fa-actions>span{font-size:10px;color:var(--ph-texto2)!important}
+
+/* rótulos de formularios en minúsculas normales (sin mayúsculas pequeñas) */
+.nk :is(.fw-summary,.fa-panel,.fc-calendar,.fw-selection-card,.fc-live-panel,.fc-compare-panel,.fc-compare-workspace)
+  :is(label,label span,strong,.fc-filter-period strong,.fc-split-date-head,.fc-split-dates span){
+  text-transform:none!important;letter-spacing:0!important;font-family:var(--ph-cuerpo)!important}
+
+/* Comparar: tarjetas y botones sobre los mapas con el mismo lenguaje */
+.nk .fc-split-tools button{border-radius:10px!important;background:var(--ph-bg)!important;border:1px solid var(--ph-linea)!important;color:var(--ph-texto)!important;box-shadow:var(--nk-hard)!important}
+.nk .fc-split-tools button:hover{border-color:var(--ph-anio)!important}
+.nk .fc-split-tools button.is-active{background:var(--ph-anio)!important;color:#141210!important;border-color:#141210!important;box-shadow:2px 2px 0 #b5367a!important}
+.nk .fc-compare-buttons .is-primary{background:var(--ph-anio)!important;color:#141210!important;border:2px solid #141210!important;box-shadow:3px 3px 0 #b5367a!important}
+.nk .fc-compare-buttons .is-primary *{color:#141210!important}
+.nk :is(.fc-split-dates,.fc-split-label,.fc-compare-actions){font-family:var(--ph-cuerpo);color-scheme:dark}
+.nk .fc-split-dates :is(input,select){background:#1f1b1c!important;color:var(--ph-texto)!important;border:1px solid var(--ph-linea)!important}
+.fa-dias-mes{fill:rgba(20,18,16,.07)}
+.nk .fa-dias-mes{fill:rgba(252,165,10,.1);stroke:rgba(252,165,10,.45);stroke-dasharray:3 3}

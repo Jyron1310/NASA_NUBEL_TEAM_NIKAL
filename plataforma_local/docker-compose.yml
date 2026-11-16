@@ -1,0 +1,15 @@
+# Levanta la plataforma completa en http://localhost:8000
+#   cd plataforma_local && docker compose up --build
+# Contexto = raíz del repositorio (como el Dockerfile.modelo de Antonio). En una copia local con
+# otra estructura, define FIRECAL_BUILD_CONTEXT, FIRECAL_DOCKERFILE y FIRECAL_PLAT_DIR en un .env.
+services:
+  firecal:
+    build:
+      context: ${FIRECAL_BUILD_CONTEXT:-..}
+      dockerfile: ${FIRECAL_DOCKERFILE:-plataforma_local/Dockerfile}
+      args:
+        PLAT_DIR: ${FIRECAL_PLAT_DIR:-plataforma_local}
+    image: firecal-cusco:local
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

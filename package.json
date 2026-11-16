@@ -1,0 +1,7 @@
+{
+  "name": "nikal-vercel-deploy",
+  "private": true,
+  "scripts": {
+    "build": "npm ci --prefix plataforma_local/frontend && npm run build --prefix plataforma_local/frontend"
+  }
+}

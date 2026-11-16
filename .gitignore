@@ -1,0 +1,16 @@
+# Datos crudos y temporales
+data/raw/
+firms_raw/
+clima_out/
+armoniza_out*/
+*.npz
+__pycache__/
+*.pyc
+# Credenciales
+.env
+*credentials*
+*.key
+
+# Credenciales en espanol (las de Meteomatics, FIRMS...) y datos descargados de Meteomatics
+*credenciales*
+exploratorio/meteomatics/datos/

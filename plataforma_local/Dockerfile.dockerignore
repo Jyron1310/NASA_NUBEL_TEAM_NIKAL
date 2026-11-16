@@ -1,0 +1,19 @@
+# Contexto = raíz del repositorio (o la copia local). Solo entra lo que la imagen copia.
+# Patrón tomado de Dockerfile.modelo.dockerignore de Antonio.
+*
+!plataforma_local/backend
+!plataforma_local/frontend
+!backend
+!frontend
+!data/harmonized
+!harmonizacion/cusco_ref
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/node_modules
+**/dist
+**/backend/data
+**/backend/.env
+**/backend/tests
+**/*.duckdb

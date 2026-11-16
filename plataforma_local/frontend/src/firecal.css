@@ -1,0 +1,275 @@
+/* Estilos agregados a la interfaz de Dante (fire-map.css) para el calendario histórico de Cusco. */
+.fc-calendar{position:absolute;z-index:660;left:430px;right:142px;bottom:120px;max-height:calc(100dvh - 250px);display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:16px;backdrop-filter:blur(20px);box-shadow:0 22px 60px rgba(0,0,0,.3);overflow:hidden}
+.fc-calendar-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 14px 8px}
+.fc-calendar-head p{margin:0;font:8px var(--mono);letter-spacing:.12em;color:var(--green)}
+.fc-calendar-head h2{margin:4px 0 0;font-size:13px;font-weight:600}
+.fc-toggle{display:flex;gap:4px}
+.fc-toggle button{border:1px solid var(--line);background:rgba(255,255,255,.04);color:#c8d6cf;border-radius:8px;padding:5px 9px;font-size:10px;cursor:pointer;display:grid;place-items:center}
+.fc-toggle button.is-active{background:#223f35;border-color:rgba(184,243,107,.35);color:#fff}
+.fc-calendar-grid{overflow:auto;padding:0 14px}
+.fc-calendar table{border-collapse:separate;border-spacing:2px;font-size:9.5px;font-variant-numeric:tabular-nums;width:100%}
+.fc-calendar th{color:#d0d5dd;font:8px var(--mono);font-weight:400;padding:0 3px;position:sticky;top:0;background:rgba(8,22,18,.96)}
+.fc-calendar tbody th{text-align:right;padding-right:6px;position:static;background:none;color:#344054;font-weight:600}
+.fc-calendar td{height:19px;min-width:34px;text-align:center;border-radius:3px;cursor:pointer}
+.fc-calendar td.is-empty{background:transparent;cursor:default}
+.fc-calendar td.is-nodata,.fc-legend .sw.is-nodata{background:#3b4a44 repeating-linear-gradient(-45deg,rgba(255,255,255,.18) 0 2px,transparent 2px 6px);cursor:default}
+.fc-calendar td.is-extrap,.fc-legend .sw.is-extrap{opacity:.72;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.45) 0 3px,transparent 3px 7px)}
+.fc-calendar td.is-uncertain,.fc-legend .sw.is-uncertain{outline:1.5px dashed #b8f36b;outline-offset:-2px}
+.fc-calendar td.is-selected{outline:2px solid #fff;outline-offset:-1px}
+.fc-calendar td.is-viirs{box-shadow:inset 3px 0 0 #b8f36b}
+.fc-calendar td:hover:not(.is-empty):not(.is-nodata){outline:2px solid #5ee7d7;outline-offset:-1px}
+.fc-legend{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:8px 14px 12px;font-size:10.5px;color:#344054}
+.fc-legend .sw{display:inline-block;width:16px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle;border:1px solid rgba(255,255,255,.12)}
+.fc-cls{display:inline-flex;align-items:center}
+.fc-margin{margin:0 14px 8px;font-size:11px;color:#b54708}
+.fc-notice{margin:0 14px 8px;font-size:11px;color:#067647}
+.fc-notes{margin:0 14px 10px;padding-left:16px;font-size:10.5px;color:#475467;line-height:1.45}
+.fc-credits{margin:0 14px 12px;font:9.5px var(--mono);color:#475467}
+.fw-time-info .fc-year{border:1px solid var(--line);background:rgba(255,255,255,.04);color:#dce7e1;border-radius:7px;width:24px;height:24px;display:grid;place-items:center;cursor:pointer}
+.fw-time-info .fc-year:disabled{opacity:.35;cursor:default}
+.fw-days button:disabled{opacity:.35;cursor:default}
+.fw-days button.is-extrap b{opacity:.6}
+.fw-risk--incierto{color:#b8f36b}
+.fw-risk--incierto i{background:transparent;border:1.5px dashed #b8f36b}
+.fw-summary{max-height:calc(100dvh - 230px);overflow-y:auto}
+@media(max-width:950px){.fc-calendar{left:18px;right:18px;bottom:112px}}
+@media(max-width:650px){.fc-calendar{left:10px;right:10px;bottom:100px;max-height:45dvh}}
+/* Panel "En simple": frases y gráficos descargables (SimplePanel.jsx). */
+.fs-panel{position:absolute;z-index:700;left:88px;right:18px;top:80px;bottom:112px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:16px;backdrop-filter:blur(20px);box-shadow:0 22px 60px rgba(0,0,0,.3);overflow:hidden}
+.fs-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:14px 18px 10px;border-bottom:1px solid var(--line)}
+.fs-head p{margin:0;font:8px var(--mono);letter-spacing:.12em;color:var(--green)}
+.fs-head h2{margin:4px 0 0;font-size:16px;font-weight:600}
+.fs-head button,.fs-actions button{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;font:inherit;font-size:12px;padding:6px 9px;cursor:pointer}
+.fs-body{overflow:auto;padding:14px 18px 18px}
+.fs-frases{margin:0 0 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px 22px}
+.fs-frases dt{font-size:12px;font-weight:600;color:var(--green)}
+.fs-frases dd{margin:3px 0 0;font-size:14px;line-height:1.45}
+.fs-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:14px;margin-bottom:12px}
+.fs-chart{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.fs-chart header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.fs-chart h3{margin:0;font-size:13px;font-weight:600}
+.fs-chart select{font:inherit;font-size:12px;padding:4px 8px;border-radius:8px;border:1px solid var(--line);background:#fff;color:#1d2330}
+.fs-svg{background:#fff;border-radius:8px;padding:4px}
+.fs-svg svg{display:block;width:100%;height:auto}
+.fs-answer{margin:10px 0 4px;font-size:13.5px;line-height:1.45}
+.fs-how{margin:0;font-size:11.5px;color:var(--muted);line-height:1.4}
+.fs-error{margin:0 0 10px;color:#f87171;font-size:13px}
+.fs-actions{display:flex;gap:8px;margin-top:10px}
+@media(max-width:650px){.fs-panel{left:10px;right:10px;top:70px;bottom:100px}}
+.fc-lang{display:flex;gap:2px;margin-right:6px;border:1px solid var(--line);border-radius:8px;padding:2px}
+.fc-lang button{border:0;background:transparent;color:#c8d6cf;font:600 10px var(--mono);padding:4px 7px;border-radius:6px;cursor:pointer}
+.fc-lang button.is-active{background:#223f35;color:#fff}
+
+/* ---- Integración con el diseño de Dante (rama dante, b4dbf8c): cabecera, línea de tiempo, capas ---- */
+.fc-topright{position:absolute;z-index:720;top:16px;right:16px;display:flex;align-items:center;gap:8px}
+.fc-app-name{display:flex;flex-direction:column;align-items:flex-end;padding:0 4px;color:#0f172a;text-shadow:0 1px 2px rgba(255,255,255,.8)}
+.fc-app-name b{font-size:13px;font-weight:700}
+.fc-app-name small{font-size:10.5px;color:#334155}
+.fc-live{height:32px;padding:0 10px;display:flex;align-items:center;gap:7px;border:1px solid #cbd5e1;border-radius:4px;background:rgba(255,255,255,.96);color:#0f172a;font-size:11px;font-weight:600}
+.fc-live i{width:7px;height:7px;border-radius:50%;background:#16a34a}
+.fc-lang{display:flex;gap:2px;border:1px solid #cbd5e1;border-radius:4px;padding:2px;background:rgba(255,255,255,.96)}
+.fc-lang button{border:0;background:transparent;color:#334155;font:600 11px var(--mono);padding:5px 8px;border-radius:3px;cursor:pointer}
+.fc-lang button.is-active{background:#197bb5;color:#fff}
+.fc-help{width:32px;height:32px;border:1px solid #cbd5e1;border-radius:4px;background:rgba(255,255,255,.96);color:#334155;display:grid;place-items:center;cursor:pointer}
+.fc-timeline .fw-timeline-panel .fw-days{grid-template-columns:repeat(12,1fr)}
+.fc-timeline .fw-days button{position:relative;flex-direction:column;gap:0}
+.fc-timeline .fw-days button small{font-size:9px}
+.fc-timeline .fw-days button i{position:absolute;bottom:0;left:0;height:2px;background:#31a2dc}
+.fc-timeline .fw-days button:disabled{opacity:.35;cursor:default}
+.fc-timeline .fw-year-scale .fc-year{min-width:26px;padding:0;display:grid;place-items:center;color:#d8e7ef}
+.fc-points-legend{margin-top:6px;padding:8px 4px 2px;border-top:1px solid #e2e8f0;font-size:11px;color:#334155}
+.fc-points-legend>span{display:block;font:500 8px var(--mono);letter-spacing:.09em;color:#475569;margin-bottom:4px}
+.fc-points-legend p{margin:3px 0;display:flex;align-items:center;gap:7px}
+.fc-points-legend i{width:10px;height:10px;border-radius:50%;border:1px solid #fff4df;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.fc-points-legend i.modis{background:#ff9b3f}
+.fc-points-legend i.viirs{background:#f33932}
+.fc-points-legend i.outside{background:#f33932;opacity:.35}
+.fc-calendar{left:426px;right:196px;bottom:110px}
+/* Teclado: foco visible (auditoría: ninguna celda era alcanzable). */
+.fc-calendar td:focus-visible{outline:3px solid #197bb5;outline-offset:-2px}
+button:focus-visible,select:focus-visible{outline:2px solid #197bb5;outline-offset:2px}
+/* Celular: el menú lateral pasa a una barra horizontal bajo el logo (antes desaparecía). */
+@media(max-width:950px){
+  .fw-rail{display:flex!important;flex-direction:row;top:64px;left:10px;right:10px;bottom:auto;width:auto;height:auto;padding:4px;gap:2px;border-radius:6px;overflow-x:auto}
+  .fw-rail button{flex:1 0 54px;height:44px}
+  .fw-summary{top:120px}
+  .fc-app-name{display:none}
+  .fc-calendar{left:10px;right:10px;bottom:100px}
+}
+@media(max-width:650px){.fc-live{display:none}.fc-topright{top:12px;right:10px}}
+/* Línea de tiempo: 12 meses + 26 años (Dante la diseñó para 5 días y 820 px). */
+.fc-timeline{width:min(1180px,calc(100vw - 130px))}
+.fc-timeline .fw-timeline-panel{min-width:0}
+.fc-timeline .fw-timeline-options{min-width:0}
+.fc-timeline .fw-year-scale{flex:1 1 auto;min-width:0}
+.fc-timeline .fw-timeline-source{flex:0 0 auto}
+/* Controles de arriba a la derecha: a la izquierda de la columna de capas de Dante. */
+.fc-topright{right:72px}
+@media(max-width:950px){.fc-timeline{width:calc(100vw - 20px)}}
+/* Las etiquetas de Dante (Cusco · MODIS + VIIRS · periodo) repiten el recuadro de la línea de tiempo
+   y quedaban detrás de los controles de idioma. */
+.fw-map-meta{display:none}
+
+/* QA de Erik / revisión 7: escala de años con flechas fijas y años desplazables */
+.fc-timeline .fw-year-scale{overflow:visible;gap:2px}
+.fc-timeline .fc-years{position:relative;display:flex;gap:2px;min-width:0;flex:1 1 auto;overflow-x:auto;scrollbar-width:none}
+.fc-timeline .fc-years::-webkit-scrollbar{display:none}
+.fc-timeline .fc-years button{min-width:30px;padding:0 3px}
+@media(max-width:1500px){.fc-timeline .fw-timeline-source span{display:none}}
+@media(max-width:650px){.fc-timeline .fc-years button{min-width:28px}}
+
+/* Panel de fondo y leyenda (Dante, 2dad4eb), adaptado: sin FRP, colores reales de la capa de
+   densidad y leyenda de puntos MODIS/VIIRS. En pantallas anchas la línea de tiempo deja libre la
+   esquina derecha (nuestra línea es más ancha que la de Dante para que quepan los 26 años). */
+.fw-heat-legend>i{background:linear-gradient(90deg,#fde68a 0%,#f59e0b 30%,#ea580c 58%,#dc2626 80%,#7f1d1d 100%)}
+.fw-heat-legend header span{font-size:7px}
+.fc-dock-points p{margin:3px 0;display:flex;align-items:center;gap:7px;font-size:10px;color:#dbe7ee}
+.fc-dock-points i{width:10px;height:10px;border-radius:50%;border:1px solid #fff4df}
+.fc-dock-points i.modis{background:#ff9b3f}.fc-dock-points i.viirs{background:#f33932}
+.fc-dock-points i.outside{background:#f33932;opacity:.35}
+@media(min-width:1201px){.fc-timeline{left:96px;right:244px;width:auto;transform:none}}
+@media(max-width:1200px) and (min-width:951px){.fw-display-dock{bottom:124px}}
+
+/* Compact right-side tool launcher: language, menu trigger and expandable actions. */
+.fc-map-menu{position:absolute;z-index:730;top:14px;right:14px;display:flex;flex-direction:column;align-items:center;gap:7px}
+.fc-map-menu .fc-lang{margin:0;border-color:rgba(183,202,215,.72);border-radius:18px;padding:3px;background:rgba(12,36,56,.94);box-shadow:0 7px 18px rgba(5,27,42,.22);backdrop-filter:blur(12px)}
+.fc-map-menu .fc-lang button{min-width:29px;height:25px;padding:0 7px;border-radius:13px;color:#c7d9e4;font-size:9px}
+.fc-map-menu .fc-lang button.is-active{background:#2388bf;color:#fff;box-shadow:0 2px 7px rgba(4,42,64,.3)}
+.fc-menu-toggle{width:44px;height:44px;border:1px solid rgba(188,216,231,.5);border-radius:50%;background:#167caf;color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 7px 18px rgba(5,31,48,.28);transition:transform .18s ease,background .18s ease,box-shadow .18s ease}
+.fc-menu-toggle:hover{background:#1d90c8;transform:translateY(-1px);box-shadow:0 9px 22px rgba(5,31,48,.34)}
+.fc-menu-toggle.is-open{background:#0d4e72;box-shadow:0 0 0 2px rgba(255,255,255,.85),0 9px 22px rgba(5,31,48,.34)}
+.fc-map-menu .fw-rail{position:static!important;display:flex!important;flex-direction:column!important;width:44px!important;height:auto!important;padding:0!important;gap:7px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;overflow:visible!important;animation:fc-tools-in .18s ease-out both}
+.fc-map-menu .fw-rail button{flex:0 0 40px!important;width:40px!important;height:40px!important;margin:0 2px!important;padding:0!important;border:1px solid rgba(184,210,225,.34)!important;border-radius:50%!important;background:rgba(12,36,56,.94)!important;color:#c7d9e4!important;display:grid!important;place-items:center!important;box-shadow:0 6px 16px rgba(5,27,42,.24)!important;backdrop-filter:blur(12px);transition:transform .15s ease,background .15s ease,color .15s ease!important}
+.fc-map-menu .fw-rail button span{display:none!important}
+.fc-map-menu .fw-rail button:hover{background:#185a7e!important;color:#fff!important;transform:translateX(-2px)}
+.fc-map-menu .fw-rail button.is-active{background:#167caf!important;color:#fff!important;box-shadow:0 0 0 2px rgba(255,255,255,.9),0 6px 16px rgba(5,27,42,.28)!important}
+.fc-map-menu .fw-rail button.is-active svg{color:inherit!important}
+.fc-map-menu~.fw-layers{right:72px;top:54px}
+@keyframes fc-tools-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:650px){.fc-map-menu{top:9px;right:9px;gap:5px}.fc-map-menu .fc-lang button{min-width:26px;height:23px;padding:0 6px}.fc-menu-toggle{width:40px;height:40px}.fc-map-menu .fw-rail{width:40px!important;gap:5px!important}.fc-map-menu .fw-rail button{width:36px!important;height:36px!important;flex-basis:36px!important}.fc-map-menu~.fw-layers{right:58px;top:48px}}
+
+/* Left data access and regional model information. */
+.fc-data-launcher{position:absolute;z-index:730;top:78px;left:14px;width:58px;height:54px;padding:0;border:1px solid rgba(177,204,220,.28);border-radius:5px;background:rgba(12,36,56,.94);color:#a9c0ce;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 7px 20px rgba(5,27,42,.24);backdrop-filter:blur(12px);cursor:pointer}
+.fc-data-launcher span{font:600 7px 'IBM Plex Sans',sans-serif;letter-spacing:.04em}.fc-data-launcher:hover,.fc-data-launcher.is-active{background:#17698f;color:#fff}.fc-data-launcher.is-active{box-shadow:inset 3px 0 #56b9e8,0 7px 20px rgba(5,27,42,.24)}
+.fc-simple-launcher{top:140px}
+.fc-compare-launcher{top:202px}
+.fc-region-picker{padding:12px 18px;border-bottom:1px solid #dbe6ed;background:#f7fafc;color:#18384f}
+.fc-region-picker label{margin-bottom:7px;display:flex;align-items:center;gap:7px;color:#557184;font-size:8px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.fc-region-picker select{width:100%;height:36px;padding:0 34px 0 10px;border:1px solid #bdceda;border-radius:4px;background:#fff;color:#102c42;font:600 11px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.fc-region-picker small{margin-top:7px;display:flex;align-items:center;gap:7px;color:#60798a;font-size:8px}.fc-region-picker small i{width:6px;height:6px;border-radius:50%;background:#22a06b;box-shadow:0 0 0 3px rgba(34,160,107,.12)}
+.fc-filter-panel{padding:14px 16px 13px;border-bottom:1px solid #d7e3ea;background:#f7fafc;color:#18384f}
+.fc-filter-panel>p{margin:0 0 13px;padding:9px 10px;border:1px solid #bed8e8;border-radius:4px;background:#edf6fb;color:#3c6379;font-size:9px;line-height:1.45}
+.fc-filter-panel label{display:flex;flex-direction:column;gap:5px;color:#526f81;font-size:7px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.fc-filter-panel select,.fc-filter-panel input{width:100%;height:35px;padding:0 9px;border:1px solid #b9cbd6;border-radius:4px;background:#fff;color:#15364d;font:600 10px 'IBM Plex Sans',sans-serif;outline:none}
+.fc-filter-panel select:focus,.fc-filter-panel input:focus{border-color:#2388bf;box-shadow:0 0 0 2px rgba(35,136,191,.12)}
+.fc-filter-period{margin-top:13px;padding-top:12px;border-top:1px solid #dbe5eb}
+.fc-filter-period>strong{display:flex;align-items:center;gap:6px;margin-bottom:9px;color:#526f81;font-size:7px;letter-spacing:.08em;text-transform:uppercase}.fc-filter-period>strong svg{width:13px;height:13px;color:#2388bf}
+.fc-filter-period>div{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fc-filter-period input[type=date]{padding:0 7px;cursor:pointer;color-scheme:light}
+.fc-filter-panel>button{width:100%;height:34px;border-radius:4px;display:flex;align-items:center;justify-content:center;gap:7px;font:700 9px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.fc-filter-apply{margin-top:12px;border:1px solid #197bb5;background:#197bb5;color:#fff}.fc-filter-apply:hover{background:#126a9f}
+.fc-filter-clear{margin-top:7px;border:1px solid #c6d4dc;background:#fff;color:#536f7f}.fc-filter-clear:hover{background:#edf4f7;color:#173b51}
+.fc-filter-panel>small{margin-top:10px;display:flex;align-items:center;gap:7px;color:#60798a;font-size:7.5px;line-height:1.35}.fc-filter-panel>small i{flex:0 0 auto;width:6px;height:6px;border-radius:50%;background:#22a06b;box-shadow:0 0 0 3px rgba(34,160,107,.12)}
+.fc-model-card{margin:0 14px 12px;border:1px solid #d5e2e9;border-radius:5px;background:#f7fafc;color:#18384f;overflow:hidden}
+.fc-model-card header{padding:9px 10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #dce7ed}.fc-model-card header>svg{color:#197bb5}.fc-model-card header div{display:flex;flex-direction:column}.fc-model-card header b{font-size:9px}.fc-model-card header span{margin-top:2px;color:#718896;font-size:7px}
+.fc-model-card dl{margin:0;display:grid;grid-template-columns:1fr 1fr}.fc-model-card dl div{padding:8px 10px;border-right:1px solid #e1e9ee;border-bottom:1px solid #e1e9ee}.fc-model-card dl div:nth-child(2n){border-right:0}.fc-model-card dl div:nth-last-child(-n+2){border-bottom:0}.fc-model-card dt{color:#718896;font-size:7px;text-transform:uppercase;letter-spacing:.06em}.fc-model-card dd{margin:3px 0 0;color:#18384f;font:600 9px 'IBM Plex Mono',monospace}.fc-model-card dd.is-ok{color:#14805e}
+@media(max-width:650px){.fc-data-launcher{top:62px;left:9px;width:48px;height:46px}.fc-simple-launcher{top:114px}.fc-compare-launcher{top:166px}.fw-summary{left:64px;right:9px;width:auto}}
+
+/* Historical comparison: an editorial analysis workspace, not another floating dashboard. */
+.fc-compare-panel{position:absolute;z-index:790;top:54px;bottom:86px;left:88px;right:72px;max-width:1180px;margin:auto;display:flex;flex-direction:column;border:1px solid #c9d8e1;border-radius:7px;background:#f5f8fa;color:#15354c;box-shadow:0 24px 70px rgba(4,27,42,.34);overflow:hidden}
+.fc-compare-head{min-height:78px;padding:13px 17px;display:grid;grid-template-columns:minmax(230px,1fr) auto 34px;align-items:center;gap:18px;border-bottom:1px solid #d7e3e9;background:#fff}
+.fc-compare-head p{margin:0;color:#197bb5;font:600 7px 'IBM Plex Mono',monospace;letter-spacing:.13em}.fc-compare-head h2{margin:4px 0 3px;font-size:19px;letter-spacing:-.02em}.fc-compare-head>div:first-child>span{display:flex;align-items:center;gap:5px;color:#657f90;font-size:8px}
+.fc-compare-selectors{display:flex;align-items:flex-end;gap:7px}.fc-compare-selectors label{display:flex;flex-direction:column;gap:4px;color:#687f8f;font-size:7px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.fc-compare-selectors select{width:94px;height:33px;padding:0 8px;border:1px solid #b8cad5;border-radius:4px;background:#fff;color:#14364e;font:600 11px 'IBM Plex Mono',monospace}.fc-compare-selectors button,.fc-compare-close{border:1px solid #c3d2db;border-radius:4px;background:#fff;color:#426176;display:grid;place-items:center;cursor:pointer}.fc-compare-selectors button{width:32px;height:33px}.fc-compare-close{width:34px;height:34px}.fc-compare-selectors button:hover,.fc-compare-close:hover{border-color:#197bb5;color:#197bb5}
+.fc-compare-body{padding:16px 18px 22px;overflow:auto}.fc-compare-summary{padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-left:3px solid #197bb5;background:#e9f3f8}.fc-compare-summary span{color:#197bb5;font:700 7px 'IBM Plex Mono',monospace;letter-spacing:.1em}.fc-compare-summary p{margin:5px 0 0;max-width:850px;color:#264c63;font-size:12px;line-height:1.5}.fc-compare-summary>svg{flex:0 0 auto;color:#197bb5}
+.fc-compare-metrics{margin-top:13px;display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #d4e0e7;background:#fff}.fc-compare-metrics article{min-width:0;padding:11px 12px;border-right:1px solid #dbe5ea;display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}.fc-compare-metrics article:last-child{border-right:0}.fc-compare-metrics article>span{grid-column:1/-1;color:#657f90;font-size:7px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}.fc-compare-metrics article>div{display:flex;flex-direction:column}.fc-compare-metrics b{color:#14354d;font-size:15px}.fc-compare-metrics i{margin-top:2px;color:#788f9d;font:500 7px 'IBM Plex Mono',monospace;font-style:normal}.fc-compare-metrics strong{grid-column:1/-1;color:#526f81;font:600 7px 'IBM Plex Mono',monospace}.fc-compare-metrics strong.is-up{color:#b54708}.fc-compare-metrics strong.is-down{color:#14805e}
+.fc-compare-grid-layout{margin-top:13px;display:grid;grid-template-columns:1fr 1fr;gap:13px}.fc-compare-chart{position:relative;border:1px solid #d4e0e7;background:#fff;padding:13px 14px 9px}.fc-compare-chart header{padding-right:140px;display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.fc-compare-chart header>div{display:flex;align-items:center;gap:8px}.fc-compare-chart header span{color:#197bb5;font:700 8px 'IBM Plex Mono',monospace}.fc-compare-chart h3{margin:0;font-size:12px}.fc-compare-chart header p{margin:0;max-width:270px;color:#6c8493;font-size:8px;line-height:1.4}.fc-compare-chart svg{display:block;width:100%;height:auto;margin-top:10px}.fc-compare-chart svg text{fill:#708997;font:8px 'IBM Plex Mono',monospace}.fc-compare-grid{stroke:#dce6eb;stroke-width:1}.fc-compare-chart rect.is-first{fill:#285b78}.fc-compare-chart rect.is-second{fill:#d76a24}.fc-compare-chart polyline{fill:none;stroke-width:2.5}.fc-compare-chart polyline.is-first{stroke:#285b78}.fc-compare-chart polyline.is-second{stroke:#d76a24}.fc-compare-chart circle{stroke:#fff;stroke-width:1}.fc-compare-chart circle.is-first{fill:#285b78}.fc-compare-chart circle.is-second{fill:#d76a24}.fc-compare-legend{position:absolute;top:13px;right:14px;display:flex;align-items:center;gap:5px;color:#587385;font:600 7px 'IBM Plex Mono',monospace}.fc-compare-legend i{width:12px;height:4px;margin-left:7px}.fc-compare-legend i.is-first{background:#285b78}.fc-compare-legend i.is-second{background:#d76a24}
+.fc-compare-notes{margin-top:13px;padding:12px 14px;display:flex;gap:11px;border:1px solid #d4e0e7;background:#fff}.fc-compare-notes>svg{flex:0 0 auto;color:#197bb5}.fc-compare-notes b{font-size:10px}.fc-compare-notes p{margin:4px 0;color:#587385;font-size:9px;line-height:1.45}.fc-compare-notes small{color:#8296a2;font:7px 'IBM Plex Mono',monospace}.fc-compare-footer{min-height:46px;padding:8px 17px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #d4e0e7;background:#fff}.fc-compare-footer span{color:#718894;font:7px 'IBM Plex Mono',monospace}.fc-compare-footer button{height:30px;padding:0 11px;border:1px solid #197bb5;border-radius:4px;background:#197bb5;color:#fff;display:flex;align-items:center;gap:7px;font-size:8px;font-weight:700;cursor:pointer}.fc-compare-footer button:hover{background:#126a9f}.fc-compare-empty{margin:auto;color:#587385}
+@media(max-width:1050px){.fc-compare-panel{right:14px}.fc-compare-head{grid-template-columns:1fr auto 34px}.fc-compare-grid-layout{grid-template-columns:1fr}.fc-compare-metrics{grid-template-columns:1fr 1fr}.fc-compare-metrics article:nth-child(2){border-right:0}.fc-compare-metrics article:nth-child(-n+2){border-bottom:1px solid #dbe5ea}}
+@media(max-width:650px){.fc-compare-panel{left:64px;right:8px;top:58px;bottom:70px}.fc-compare-head{padding:10px;grid-template-columns:1fr 30px;gap:8px}.fc-compare-head>div:first-child>span{display:none}.fc-compare-selectors{grid-column:1/-1;grid-row:2}.fc-compare-selectors label{flex:1}.fc-compare-selectors select{width:100%}.fc-compare-close{grid-column:2;grid-row:1;width:30px;height:30px}.fc-compare-body{padding:10px}.fc-compare-summary p{font-size:10px}.fc-compare-summary>svg{display:none}.fc-compare-metrics{grid-template-columns:1fr}.fc-compare-metrics article{border-right:0;border-bottom:1px solid #dbe5ea!important}.fc-compare-chart{padding:10px}.fc-compare-chart header{padding-right:0;display:block}.fc-compare-chart header p{margin-top:5px}.fc-compare-legend{position:static;margin-top:7px;justify-content:flex-end}.fc-compare-footer span{display:none}.fc-compare-footer{justify-content:flex-end}}
+
+/* Split-screen comparison workspace. Each pane owns its dates, map state and AOI box. */
+.fc-compare-workspace{position:fixed;z-index:2000;inset:0;background:#071b29;color:#fff;overflow:hidden}.fc-split-stage{position:absolute;inset:0 0 78px;display:grid;grid-template-columns:1fr 1fr}.fc-split-map{position:relative;min-width:0;overflow:hidden;background:#153047}.fc-split-map.is-a{border-right:2px solid #4aaed9}.fc-split-canvas{position:absolute;inset:0}.fc-split-map:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,20,31,.26),transparent 26%,transparent 70%,rgba(4,20,31,.2))}
+.fc-split-label{position:absolute;z-index:5;top:14px;left:14px;height:30px;padding:0 10px 0 5px;border:1px solid rgba(174,210,229,.45);border-radius:4px;background:rgba(8,35,52,.92);display:flex;align-items:center;gap:7px;box-shadow:0 5px 15px rgba(3,20,31,.22)}.fc-split-label b{width:20px;height:20px;border-radius:3px;background:#2388bf;display:grid;place-items:center;font:700 9px 'IBM Plex Mono',monospace}.fc-split-map.is-b .fc-split-label b{background:#d76a24}.fc-split-label span{font:600 8px 'IBM Plex Sans',sans-serif}
+.fc-split-dates{position:absolute;z-index:5;top:52px;left:14px;width:292px;padding:9px;display:grid;grid-template-columns:1fr 1fr;gap:8px;border:1px solid rgba(177,207,224,.4);border-radius:7px;background:rgba(8,35,52,.94);box-shadow:0 8px 22px rgba(3,20,31,.25);backdrop-filter:blur(10px)}.fc-split-date-head{grid-column:1/-1;display:flex;align-items:center;gap:6px;padding-bottom:6px;border-bottom:1px solid rgba(157,190,209,.2);color:#d8e7ee;font:600 7px 'IBM Plex Sans',sans-serif}.fc-split-date-head svg{width:13px;height:13px;color:#55bce4}.fc-split-dates label{display:flex;flex-direction:column;gap:5px;color:#9db6c5;font-size:6px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}.fc-split-dates input{box-sizing:border-box;width:133px;height:32px;padding:0 7px;border:1px solid #58758a;border-radius:4px;background:#fff;color:#15364d;font:600 8px 'IBM Plex Sans',sans-serif;cursor:pointer;color-scheme:light}.fc-split-dates input:hover,.fc-split-dates input:focus{border-color:#45b3df;outline:2px solid rgba(69,179,223,.18);outline-offset:0}
+.fc-split-tools{position:absolute;z-index:6;top:15px;right:14px;display:flex;flex-direction:column;gap:7px}.fc-split-tools button{width:38px;height:38px;padding:0;border:1px solid rgba(177,210,228,.42);border-radius:50%;background:rgba(8,35,52,.92);color:#bad0dc;display:grid;place-items:center;cursor:pointer;box-shadow:0 5px 15px rgba(3,20,31,.25)}.fc-split-tools button svg{width:17px}.fc-split-tools button:hover,.fc-split-tools button.is-active{background:#197fb5;color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.75),0 5px 15px rgba(3,20,31,.25)}
+.fc-workspace-close{position:absolute;z-index:8;top:13px;left:50%;width:34px;height:34px;border:1px solid rgba(191,216,229,.5);border-radius:50%;background:#0b2b3e;color:#d8e8f0;display:grid;place-items:center;cursor:pointer;transform:translateX(-50%);box-shadow:0 6px 20px rgba(2,17,27,.34)}.fc-workspace-close:hover{background:#154c6a;color:#fff}
+.fc-compare-actions{position:absolute;z-index:8;left:0;right:0;bottom:0;height:78px;padding:9px 15px;display:grid;grid-template-columns:minmax(150px,1fr) minmax(180px,1.2fr) auto minmax(150px,1fr);align-items:center;gap:13px;border-top:1px solid #31536b;background:rgba(8,29,43,.98);box-shadow:0 -10px 28px rgba(2,17,27,.24)}.fc-compare-side-stat{min-width:0;display:flex;flex-direction:column}.fc-compare-side-stat.is-b{text-align:right}.fc-compare-side-stat span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#91adbd;font:600 7px 'IBM Plex Mono',monospace}.fc-compare-side-stat b{margin-top:4px;color:#fff;font-size:16px}.fc-compare-side-stat b:after{content:'  focos armonizados';color:#7795a6;font-size:7px;font-weight:500}.fc-compare-result,.fc-compare-prompt{text-align:center}.fc-compare-result{display:flex;flex-direction:column}.fc-compare-result span{color:#8da8b8;font:600 7px 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase}.fc-compare-result b{margin-top:4px;font-size:15px}.fc-compare-result b.is-up{color:#f6a45f}.fc-compare-result b.is-down{color:#62d6b2}.fc-compare-prompt{color:#8fa9b8;font-size:8px;line-height:1.35}.fc-compare-buttons{display:flex;gap:7px}.fc-compare-buttons button{height:36px;padding:0 12px;border:1px solid #52748a;border-radius:4px;background:#142f42;color:#d3e1e8;display:flex;align-items:center;gap:7px;font-size:8px;font-weight:700;cursor:pointer}.fc-compare-buttons button.is-primary{border-color:#2388bf;background:#197bb5;color:#fff}.fc-compare-buttons button:hover:not(:disabled){filter:brightness(1.12)}.fc-compare-buttons button:disabled{opacity:.38;cursor:default}
+.fc-compare-workspace>.fc-compare-panel{z-index:20;top:34px;bottom:28px;left:30px;right:30px}
+@media(max-width:1050px){.fc-split-dates{width:142px;grid-template-columns:1fr}.fc-split-dates input{width:100%}.fc-compare-actions{grid-template-columns:1fr auto 1fr}.fc-compare-result,.fc-compare-prompt{display:none}.fc-compare-buttons{grid-column:2;grid-row:1}.fc-compare-side-stat.is-b{grid-column:3}}
+@media(max-width:700px){.fc-compare-workspace{left:0}.fc-split-stage{bottom:90px;grid-template-columns:1fr;grid-template-rows:1fr 1fr}.fc-split-map.is-a{border-right:0;border-bottom:2px solid #4aaed9}.fc-split-dates{top:42px;width:245px;grid-template-columns:1fr 1fr;padding:5px}.fc-split-dates input{width:112px;height:27px}.fc-split-label{top:7px;left:8px;height:27px}.fc-split-tools{top:7px;right:8px;gap:4px;flex-direction:row}.fc-split-tools button{width:30px;height:30px}.fc-split-tools button svg{width:14px}.fc-workspace-close{top:calc(50% - 17px)}.fc-compare-actions{height:90px;padding:7px;gap:6px}.fc-compare-side-stat b{font-size:12px}.fc-compare-side-stat b:after{display:none}.fc-compare-buttons{flex-direction:column;gap:4px}.fc-compare-buttons button{height:31px;padding:0 8px}.fc-compare-workspace>.fc-compare-panel{left:6px;right:6px;top:12px;bottom:12px}}
+
+/* Selected-area analysis as a centered workspace, clear of both tool rails. */
+.fw-selection-card{z-index:780;left:50%;right:auto;top:calc(50% - 34px);bottom:auto;width:min(520px,calc(100vw - 190px));max-height:calc(100dvh - 190px);transform:translate(-50%,-50%);border-radius:8px;box-shadow:0 22px 65px rgba(4,25,39,.32)}
+@media(max-width:950px){.fw-selection-card{left:50%;right:auto;top:calc(50% - 30px);bottom:auto;width:min(500px,calc(100vw - 150px));max-height:calc(100dvh - 175px);transform:translate(-50%,-50%)}}
+@media(max-width:650px){.fw-selection-card{left:50%;right:auto;top:calc(50% - 24px);bottom:auto;width:calc(100vw - 20px);max-height:calc(100dvh - 145px);transform:translate(-50%,-50%)}}
+
+/* Tiempo real (NASA FIRMS NRT) */
+.fc-live.is-live i{background:#ff1f4b;box-shadow:0 0 0 0 rgba(255,31,75,.6);animation:fc-pulse 1.6s infinite}
+@keyframes fc-pulse{0%{box-shadow:0 0 0 0 rgba(255,31,75,.6)}70%{box-shadow:0 0 0 7px rgba(255,31,75,0)}100%{box-shadow:0 0 0 0 rgba(255,31,75,0)}}
+.fw-rail button.live svg{color:#ff1f4b}
+.fc-live-panel{position:absolute;z-index:670;top:76px;right:72px;width:290px;padding:12px 14px;border-radius:8px;background:rgba(12,36,56,.96);border:1px solid rgba(180,210,226,.25);color:#e8f1f6;box-shadow:0 10px 26px rgba(5,27,42,.3)}
+.fc-live-panel header{display:flex;justify-content:space-between;align-items:center}
+.fc-live-panel header p{margin:0;font:600 8px var(--mono);letter-spacing:.1em;color:#ffb3c1;display:flex;align-items:center;gap:7px}
+.fc-live-panel header p i{width:8px;height:8px;border-radius:50%;background:#ff1f4b;animation:fc-pulse 1.6s infinite}
+.fc-live-panel header button{border:0;background:transparent;color:#cfe0ea;cursor:pointer}
+.fc-live-hours{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin:10px 0 8px;padding:3px;border-radius:16px;background:rgba(255,255,255,.06)}
+.fc-live-hours button{border:0;border-radius:13px;padding:5px 0;background:transparent;color:#b5cad7;font-size:10px;cursor:pointer}
+.fc-live-hours button.is-active{background:#197eb7;color:#fff}
+.fc-live-panel h3{margin:4px 0 2px;font-size:17px}
+.fc-live-msg{margin:2px 0 6px;font-size:11px;color:#b9cdd8}
+.fc-live-msg.is-error{color:#ffb3c1}
+.fc-live-legend{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0;font-size:10px}
+.fc-live-legend span{width:100%;font:500 7px var(--mono);letter-spacing:.08em;color:#9eb5c3}
+.fc-live-legend p{margin:0;display:flex;align-items:center;gap:5px}
+.fc-live-legend i{width:10px;height:10px;border-radius:50%;border:1.5px solid #fff}
+.fc-live-panel ul{margin:6px 0;padding-left:16px;font-size:10px;line-height:1.35;color:#c6d6df}
+.fc-live-panel small{display:block;font-size:9px;color:#8fa9b8}
+@media(max-width:950px){.fc-live-panel{top:122px;left:10px;right:10px;width:auto}}
+
+/* Dos modos separados: serie histórica | en vivo */
+.fc-mode{position:absolute;z-index:735;top:18px;left:210px;display:flex;gap:3px;padding:3px;border-radius:18px;background:rgba(12,36,56,.94);border:1px solid rgba(180,210,226,.25);box-shadow:0 6px 16px rgba(5,27,42,.25)}
+.fc-mode button{display:flex;align-items:center;gap:6px;border:0;border-radius:15px;padding:6px 14px;background:transparent;color:#b5cad7;font:600 11px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.fc-mode button:hover{color:#fff;background:rgba(255,255,255,.08)}
+.fc-mode button.is-active{background:#197eb7;color:#fff}
+.fc-mode button.is-active.live{background:#d61f45}
+.fc-live-panel{left:88px;right:auto;top:80px;width:320px}
+.fc-live-back{margin-top:10px;width:100%;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid rgba(180,210,226,.3);border-radius:6px;padding:7px;background:transparent;color:#dbe8ef;font-size:11px;cursor:pointer}
+.fc-live-back:hover{background:rgba(255,255,255,.08)}
+
+/* Modo En vivo sobre el diseño de Dante: se ocultan los elementos de la serie histórica. */
+.fw-app.is-live .fc-data-launcher,.fw-app.is-live .fw-summary,.fw-app.is-live .fs-panel,.fw-app.is-live .fc-calendar,
+.fw-app.is-live .fc-timeline,.fw-app.is-live .fw-selection-card,.fw-app.is-live .fw-draw-hint,
+.fw-app.is-live .fw-layers{display:none!important}
+.fc-live-panel{left:14px;top:78px}
+@media(max-width:950px){.fc-live-panel{left:9px;right:9px;top:118px;width:auto}}
+@media(max-width:650px){.fc-mode{top:12px;left:158px}.fc-mode button{padding:6px 9px}.fc-mode button span{display:none}}
+
+/* Panel "Ámbitos": nivel de peligro por focos de calor (AmbitosPanel.jsx). */
+.fa-panel{position:absolute;z-index:700;left:88px;top:80px;bottom:112px;width:400px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:16px;backdrop-filter:blur(20px);box-shadow:0 22px 60px rgba(0,0,0,.3);overflow:hidden}
+.fa-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:14px 16px 8px;border-bottom:1px solid var(--line)}
+.fa-head p{margin:0;font:8px var(--mono);letter-spacing:.12em;color:var(--green)}
+.fa-head h2{margin:4px 0 0;font-size:15px;font-weight:600}
+.fa-head button,.fa-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;font:inherit;font-size:12px;padding:5px 8px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.fa-controls{display:flex;flex-direction:column;gap:6px;padding:10px 16px}
+.fa-controls label{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted)}
+.fa-controls select,.fa-controls input{font:inherit;font-size:13px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:#fff;color:#1d2330}
+.fa-legend{display:flex;flex-wrap:wrap;gap:8px 12px;padding:0 16px 4px;font-size:11.5px}
+.fa-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.fa-list{list-style:none;margin:0;padding:4px 10px;overflow:auto;flex:1}
+.fa-list li{display:grid;grid-template-columns:26px auto 1fr auto;align-items:center;gap:8px;padding:6px;border-radius:8px;font-size:12.5px}
+.fa-list li.is-picked{outline:2px solid #5ee7d7}
+.fa-rank{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.fa-badge{color:#fff;font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.35)}
+.fa-name{display:flex;flex-direction:column;min-width:0}
+.fa-name b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fa-name small{color:var(--muted);font-size:10.5px}
+.fa-actions{padding:8px 16px}
+.fa-note{margin:0;padding:4px 16px;font-size:11px;color:var(--muted);line-height:1.4}
+.fa-error{margin:0;padding:6px 16px;color:#f87171;font-size:12.5px}
+@media(max-width:650px){.fa-panel{left:10px;right:10px;width:auto;top:70px;bottom:100px}}
+/* Ámbitos en el diseño de Dante: cuarto lanzador a la izquierda y panel junto a ellos. */
+.fc-ambitos-launcher{top:264px}
+.fa-panel{left:88px;top:78px;bottom:110px}
+.fw-app.is-live .fa-panel{display:none!important}
+@media(max-width:650px){.fc-ambitos-launcher{top:218px}.fa-panel{left:64px;right:9px;width:auto;top:62px;bottom:100px}}
+.fa-list li{grid-template-columns:26px auto 1fr auto auto}

@@ -1,0 +1,24 @@
+# Entorno y secretos
+.env
+.venv/
+venv/
+
+# Datos y artefactos (nunca al repositorio)
+data/
+*.duckdb
+*.duckdb.wal
+models/artifacts/*
+!models/artifacts/.gitkeep
+reports/*.png
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Reportes regenerables del pipeline
+reports/clean_summary.json

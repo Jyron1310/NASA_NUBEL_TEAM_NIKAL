@@ -1,0 +1,193 @@
+# Parámetros científicos de Nikal Perú.
+# Todo número usado por el pipeline debe venir de aquí (nada de números mágicos en el código).
+
+region:
+  # Región de trabajo = unión de los departamentos de config/regions/peru_departamentos.geojson
+  # (scripts/build_regions.py imprime este bbox). Cambiar la selección -> regenerar y actualizar.
+  name: "Sur del Perú (Cusco, Apurímac, Ayacucho, Puno, Madre de Dios)"
+  bbox: [-75.12, -17.31, -68.64, -9.95]   # [oeste, sur, este, norte]
+  buffer_km: 3
+
+timezone: "America/Lima"
+
+grid:
+  h3_res_store: 7
+  h3_res_calibration_parent: 4
+  px1km_deg: 0.01
+
+filters:
+  min_confidence: "nominal"            # low | nominal | high
+  static_source_month_fraction: 0.4
+  modis_confidence_bins: [30, 80]      # MODIS 0-100: < 30 low, 30-79 nominal, >= 80 high
+  bowtie_max_km: 1.0                   # duplicados bow-tie MODIS: misma pasada y < esta distancia
+
+harmonization:
+  reference: "aqua_day"
+  calib_window: ["2012-01-20", "2021-06-30"]
+  n20_snpp_window: ["2018-04-01", "2026-11-01"]
+  holdout_years: [2019, 2020]
+  aqua_observed_until: "2021-06"        # = fin de calib_window; revisar con la razón Aqua/S-NPP por año (Fase 4)
+  series_start: "2003-01"
+  bootstrap_reps: 1000
+  bootstrap_seed: 2026
+  dry_season_months: [5, 6, 7, 8, 9, 10]
+  data_version: "harm-v0.1"
+  h3_res_calibration_mid: 3            # nivel intermedio de fusión de estratos (antes del regional)
+  terra_aqua_window: ["2003-01-01", "2019-12-31"]   # sin 2020: la deriva de Terra empieza en 2020
+  n21_snpp_window: ["2024-01-17", "2026-11-01"]     # N21 solo como respaldo si falta N20
+  # Un estrato usa su propia razón si en la ventana tiene >= min_ref_focos focos de la referencia
+  # y datos de la referencia en >= min_years años; si no, se fusiona (res 4 -> res 3 -> regional).
+  stratum_min_ref_focos: 200
+  stratum_min_years: 5
+  # Banda band_p10/band_p90 = banda del factor (bootstrap) + error observado que depende del
+  # tamaño del conteo predicho. El error e = log((obs + c) / (pred + c)) se estima con
+  # leave-one-year-out en calib_window SIN los años reservados, por rangos de pred.
+  band_quantiles: [0.10, 0.90]
+  band_min_coverage: 0.70              # si la banda del factor cubre menos, se agrega el error
+  band_target_coverage: [0.70, 0.90]   # meta de cobertura fuera de muestra (solo se reporta)
+  band_log_offset: 1.0                 # c en log((obs + c) / (pred + c)); evita log(0)
+  band_error_pred_edges: [0, 2, 8, 30, 120]  # rangos de pred: [0,2) [2,8) [8,30) [30,120) [120,inf)
+  band_error_min_n: 30                 # un rango con menos unidades se fusiona con el vecino
+  validation_min_focos_unit: 50        # mínimo de focos observados para métricas por celda padre
+  # Periodos operativos reales de cada satélite (no del simulador). end null = sigue activo.
+  # Un satélite solo se usa en meses que cubre completos.
+  satellite_periods:
+    TERRA: ["2000-11-01", null]
+    AQUA:  ["2002-07-04", null]
+    SNPP:  ["2012-01-20", "2026-11-01"]
+    N20:   ["2018-04-01", null]
+    N21:   ["2024-01-17", null]
+
+climatology:
+  base_years: [2003, 2022]
+  # Modo percentil independiente del sensor: climatología cruda del satélite de referencia de
+  # cada mes. Si en base_years tiene menos de estos años, se usan todos sus años disponibles.
+  percentile_min_years: 5
+  # Categoría de anomalía por percentil del mes: < 10 muy por debajo, < 25 por debajo,
+  # <= 75 normal, <= 90 por encima, > 90 muy por encima.
+  category_percentiles: [10, 25, 75, 90]
+
+# Confiabilidad de un AOI según su conteo ANUAL esperado (focos equivalentes a Aqua diurno).
+# Calibrado con la validación por celda padre res 4 (años reservados, S-NPP -> Aqua): con < 25
+# focos/año el error relativo mensual típico supera ~50 %; con >= 100 queda por debajo de ~25 %.
+reliability:
+  expected_annual_low: 25              # < 25 -> "baja"
+  expected_annual_high: 100            # >= 100 -> "alta"; entre ambos -> "media"
+  report_edges: [0, 10, 25, 50, 100, 200, 400]   # rangos de la curva del reporte de validación
+
+api:
+  max_aoi_km2: 50000                   # no aplica a AOI tipo region en /calendar, /anomaly, /map/cells
+  max_csv_years: 5                     # /hotspots: rango máximo (también para regiones)
+  cors_origins: ["http://localhost:5173", "http://localhost:3000", "http://localhost:8000", "http://127.0.0.1:8000"]
+  max_point_radius_km: 100
+  max_geojson_features: 50000          # /hotspots en GeoJSON; para más, usar CSV
+  csv_chunk_rows: 50000                # filas por bloque en el CSV en streaming
+  region_simplify_deg: 0.005           # tolerancia de simplificación de /regions
+  max_csv_rows: 200000                 # /api/hotspots.csv y /api/v1/hotspots: filas máximas
+  default_lang: en                     # idioma de los textos si la solicitud no trae ?lang=en|es
+  # Protocolo de solicitudes (api/limits.py). Por cliente (IP): cubeta de fichas general y otra para
+  # las pesadas (CSV, AOI dibujados). En todo el proceso: como mucho max_concurrent_heavy pesadas a la
+  # vez; las demás esperan su turno hasta queue_timeout_s y luego reciben 503 con Retry-After.
+  # Los cupos son por IP y una sala entera (wifi, oficina) sale por la misma IP pública: están
+  # dimensionados para ~60 personas detrás de una IP (prueba de carga del 14-nov).
+  # Las respuestas servidas desde la caché (response_cache) no gastan cupo.
+  rate_limit:
+    enabled: true
+    requests_per_minute: 600           # antes 120: con 60 personas en la misma IP, 86 % de 429
+    burst: 120                         # antes 40
+    heavy_per_minute: 60               # antes 10
+    heavy_burst: 20                    # antes 5
+    max_concurrent_heavy: 4            # antes 2: con los datos en memoria un área cuesta ~0,1 s
+    queue_timeout_s: 8.0               # antes 2: esperar el turno es mejor que un 503
+    max_queue: 16                      # pesadas en espera; con más, 503 inmediato (no agota los hilos)
+    trust_proxy_headers: false         # true SOLO detrás de Azure/Cloud Run (FIRECAL_TRUST_PROXY=1)
+    proxy_hops: 1                      # IP real = la proxy_hops-ésima desde la derecha (Cloud Run: 1, comprobado en producción)
+    max_clients: 10000
+  # Caché de respuestas completas de Cusco entero (api/cache.py). Los datos son históricos: la misma
+  # consulta devuelve siempre lo mismo, así que se calcula una vez y se repite a los demás visitantes.
+  response_cache:
+    enabled: true
+    max_items: 3000                    # hay ~1.300 respuestas distintas por idioma
+    max_mb: 64                         # memoria máxima; se guardan ya comprimidas (~5 KB cada una)
+
+synthetic:
+  seed: 42
+  scale: 1.0
+  start: "2000-11-01"
+  end: null                            # null = hoy (en America/Lima)
+  nrt_days: 120                        # últimos ~4 meses salen como SYN-NRT y sin columna `type`
+
+  # --- Paisaje: pesos espaciales por celda H3 (res = grid.h3_res_store) dentro del bbox ---
+  landscape:
+    n_hot_zones: [12, 18]               # rango [min, max] de "zonas calientes" (gaussianas)
+    zone_sigma_deg: [0.08, 0.35]       # ancho de cada zona, en grados
+    zone_amplitude: [0.5, 1.0]         # intensidad relativa de cada zona
+    background_weight: 0.05            # peso del fondo relativo al pico de una zona
+
+  # --- Eventos de fuego: N mensual ~ Poisson(base * estacionalidad * factor_anual * scale) ---
+  events:
+    base_per_month: 2400   # x2 respecto a la demo de Cusco (área ~3.5x)
+    # Estacionalidad andina (ene..dic), se normaliza a media 1: pico ago-oct, mínimo dic-mar.
+    seasonality: [0.15, 0.12, 0.15, 0.30, 0.60, 1.00, 1.60, 2.60, 2.80, 1.80, 0.60, 0.25]
+    annual_sigma: 0.25                 # factor anual ~ lognormal(0, sigma)
+    n_extreme_years: [2, 3]
+    extreme_multiplier: [1.8, 2.5]
+    trend_per_year: 0.01               # tendencia leve (+1 %/año)
+    size_ha_median: 3.0                # tamaño ~ lognormal: mayoría < 10 ha, cola pesada
+    size_ha_sigma: 1.6
+    size_ha_max: 20000
+    duration_coef: 1.5                 # duración media (días) = 1 + coef * log1p(tamaño / ref)
+    duration_ref_ha: 20
+    daily_area_sigma: 0.5              # variación diaria del área activa (lognormal)
+    location_jitter_km: 0.8            # dispersión del evento alrededor del centro de la celda
+
+  # --- Ciclo diurno de intensidad (hora local) ---
+  diurnal:
+    peak_hour: 15.0
+    min_factor: 0.15                   # intensidad relativa mínima (madrugada)
+    sharpness: 2.0
+
+  # Probabilidad de pasada nublada por mes (ene..dic): alta en la temporada de lluvias.
+  cloud_prob_by_month: [0.60, 0.65, 0.60, 0.45, 0.25, 0.15, 0.12, 0.12, 0.20, 0.30, 0.40, 0.55]
+
+  # --- Detección por sensor: p = logística(log(señal / s50_ha) / slope) ---
+  sensors:
+    MODIS:
+      pixel_ha: 100                    # ~1 km
+      s50_ha: 9.0                      # señal (ha activas x ciclo diurno) con 50 % de detección;
+                                       # calibrado para VIIRS/Aqua diurno ~4.9 (real: 3.9-6.8)
+      slope: 0.6
+      coverage: 0.80                   # fracción de días con pasada útil sobre el punto
+      geoloc_sigma_km: 0.5
+    VIIRS:
+      pixel_ha: 14                     # ~375 m
+      s50_ha: 0.6
+      slope: 0.6
+      coverage: 1.00
+      geoloc_sigma_km: 0.19
+
+  # --- Satélites. `code` = valor de la columna `satellite` en los CSV sintéticos.
+  # TODO(Fase 2): verificar contra CSV reales de FIRMS qué códigos usa cada producto.
+  satellites:
+    TERRA: {sensor: MODIS, code: "Terra", start: "2000-11-01", end: null, overpass_day: 10.5,  overpass_night: 22.5}
+    AQUA:  {sensor: MODIS, code: "Aqua",  start: "2002-07-04", end: null, overpass_day: 13.5,  overpass_night: 1.5}
+    SNPP:  {sensor: VIIRS, code: "N",     start: "2012-01-20", end: "2026-11-01", overpass_day: 13.5, overpass_night: 1.5}
+    N20:   {sensor: VIIRS, code: "N20",   start: "2018-04-01", end: null, overpass_day: 14.33, overpass_night: 2.33}
+    N21:   {sensor: VIIRS, code: "N21",   start: "2024-01-17", end: null, overpass_day: 12.67, overpass_night: 0.67}
+  overpass_jitter_h: 0.6               # variación de la hora de pasada (geometría de barrido)
+
+  # --- Deriva orbital de Terra/Aqua: cambia la HORA de paso; el efecto sale del ciclo diurno ---
+  # Nodos [fecha, hora local de la pasada diurna]; interpolación lineal y constante fuera del
+  # rango. El primer nodo debe coincidir con overpass_day. La pasada nocturna se desplaza igual.
+  overpass_drift:
+    AQUA:  [["2021-07-01", 13.5], ["2023-02-01", 13.75], ["2026-08-01", 15.83]]
+    # Terra: hacia más temprano desde 2020; desplazamiento moderado (-0.5 h a fines de 2022,
+    # -1 h a nov-2026). Ajustable.
+    TERRA: [["2020-01-01", 10.5], ["2022-12-31", 10.0], ["2026-11-01", 9.5]]
+
+  # --- Ruido realista ---
+  industrial:
+    n_sources: [3, 5]                  # fuentes fijas (type = 2)
+    pass_detect_prob: 0.15             # prob. de detección por pasada y día
+  bowtie_fraction: 0.05                # duplicados "bow-tie" en MODIS
+  bowtie_offset_km: [0.3, 0.9]

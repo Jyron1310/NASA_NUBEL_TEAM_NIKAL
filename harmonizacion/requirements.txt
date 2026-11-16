@@ -1,0 +1,8 @@
+# Probado con Python 3.11.9 en Windows. No probado en Linux ni con otras versiones.
+numpy==2.4.4
+pandas==2.3.3
+matplotlib==3.10.8     # necesario en TODOS los scripts de generacion: matplotlib.path decide que puntos caen dentro de Cusco
+scipy==1.17.1          # solo sequia_fuego/
+# verificar_datos.py solo necesita numpy y pandas (es lo que instala el CI)
+# Solo para cusco_referencia.py y sequia_fuego/clima_cusco_ee.py (necesitan variable EE_PROJECT):
+# earthengine-api==1.7.22

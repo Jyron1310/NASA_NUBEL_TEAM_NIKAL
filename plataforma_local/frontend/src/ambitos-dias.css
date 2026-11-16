@@ -1,0 +1,31 @@
+/* Focos por día del año según el nivel de peligro (AmbitosDias.jsx), dentro del panel Ámbitos (fondo claro). */
+.fa-dias{margin:10px 14px 4px;padding:12px 0 4px;border-top:1px solid rgba(20,18,16,.12);border-bottom:1px solid rgba(20,18,16,.12)}
+.fa-dias h3{margin:0 0 8px;font-size:13px;font-weight:700;color:#141210}
+.fa-dias-ctrl{display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px 10px;margin-bottom:8px}
+.fa-dias-ctrl label{display:flex;flex-direction:column;gap:2px;font-size:10.5px;color:#57514a}
+.fa-dias-ctrl select{padding:3px 4px;border:1px solid rgba(20,18,16,.25);border-radius:5px;background:#fff;color:#141210;font:500 11.5px inherit;font-variant-numeric:tabular-nums}
+.fa-dias-modo{display:inline-flex;margin-left:auto;border:1px solid rgba(20,18,16,.25);border-radius:6px;overflow:hidden}
+.fa-dias-modo button{padding:4px 8px;border:0;background:transparent;color:#57514a;font:600 11px inherit;cursor:pointer}
+.fa-dias-modo button.is-active{background:#141210;color:#f5f3ee}
+.fa-dias-lead{margin:0 0 6px;font-size:12px;line-height:1.42;color:#141210}
+.fa-dias-chart{position:relative}
+.fa-dias-chart.is-loading{opacity:.55;transition:opacity .2s}
+.fa-dias-chart svg{display:block;width:100%;height:auto;font-variant-numeric:tabular-nums}
+.fa-dias-grid{stroke:rgba(20,18,16,.14)}
+.fa-dias-eje{fill:#6b655d;font-size:9px}
+.fa-dias-cursor{stroke:#141210;stroke-width:1;stroke-dasharray:2 2}
+.fa-dias-tip{position:absolute;top:2px;z-index:2;transform:translateX(-50%);display:flex;flex-direction:column;gap:1px;padding:5px 8px;border:1.5px solid #141210;border-radius:6px;background:#f5f3ee;color:#141210;font-size:10.5px;white-space:nowrap;pointer-events:none;box-shadow:2px 2px 0 rgba(20,18,16,.35)}
+.fa-dias-tip i,.fa-dias-niveles i{display:inline-block;width:8px;height:8px;margin-right:5px;border-radius:2px;vertical-align:-1px}
+.fa-dias-niveles{list-style:none;margin:8px 0 6px;padding:0;display:grid;gap:3px}
+.fa-dias-niveles li{display:flex;flex-wrap:wrap;align-items:baseline;gap:1px 8px;font-size:11px;color:#57514a}
+.fa-dias-niveles li b{color:#141210}
+/* Con esta sección el panel Ámbitos se desplaza completo y la lista conserva su propia altura. */
+.fa-panel{overflow-y:auto;scrollbar-width:thin}
+.fa-panel .fa-list{flex:none;min-height:200px;max-height:48vh}
+.fa-dias-chart svg{cursor:crosshair}
+.fa-dias-ventana{fill:rgba(20,18,16,.08)}
+.fa-dias-fijo{stroke:#141210;stroke-width:1.6}
+.fa-dias-mapa{display:flex;align-items:center;gap:4px;margin-top:6px;padding:6px;border-radius:8px;background:rgba(20,18,16,.05)}
+.fa-dias-mapa>button{flex:none;width:28px;height:28px;display:grid;place-items:center;border:1px solid rgba(20,18,16,.25);border-radius:6px;background:transparent;color:inherit;cursor:pointer}
+.fa-dias-mapa>div{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 4px;font-size:11.5px;line-height:1.3}
+.fa-dias-mapa>div span{opacity:.75}
