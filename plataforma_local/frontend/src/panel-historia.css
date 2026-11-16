@@ -6,9 +6,9 @@
   --ph-anio:#fca50a; --ph-habitual:#bdb7ad; --ph-marca:rgba(252,165,10,.38);
   --ph-ancho:480px; --ph-s1:4px; --ph-s2:8px; --ph-s3:16px; --ph-s4:22px;
   --ph-t-lead:19px; --ph-t-h3:15px; --ph-t-sub:12px; --ph-t-pie:11px;
-  --ph-titulo:'Nikal Grotesk','Segoe UI',system-ui,sans-serif; --ph-cuerpo:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --ph-titulo:'Nikal Grotesk','Segoe UI',system-ui,sans-serif; --ph-cuerpo:'Nikal Grotesk','Segoe UI',system-ui,sans-serif;
 }
-.ph-panel{position:absolute;z-index:700;right:96px;top:78px;bottom:172px;width:var(--ph-ancho);display:flex;flex-direction:column;
+.ph-panel{position:absolute;z-index:700;left:88px;top:78px;bottom:172px;width:var(--ph-ancho);display:flex;flex-direction:column;
   background:var(--ph-bg);border:1px solid var(--ph-linea);border-radius:14px;backdrop-filter:blur(14px);box-shadow:var(--nk-hard);
   color:var(--ph-texto);font-family:var(--ph-cuerpo);font-variant-numeric:tabular-nums;overflow:hidden}
 .ph-asa{display:none}

@@ -87,3 +87,13 @@
 .nk .fc-split-dates :is(input,select){background:#1f1b1c!important;color:var(--ph-texto)!important;border:1px solid var(--ph-linea)!important}
 .fa-dias-mes{fill:rgba(20,18,16,.07)}
 .nk .fa-dias-mes{fill:rgba(252,165,10,.1);stroke:rgba(252,165,10,.45);stroke-dasharray:3 3}
+
+/* Tipografía común de los tres capítulos (Look, Understand, Act): la escala del panel Understand.
+   Una sola familia (Space Grotesk) y los mismos tamaños: título 19, subtítulo 15, texto 12, rótulos 11. */
+.nk :is(.fw-summary,.fa-panel),.nk :is(.fw-summary,.fa-panel) *{font-family:var(--ph-cuerpo)!important}
+.nk .fw-summary-head h1,.nk .fa-panel h2{font-size:19px!important;font-weight:700!important;letter-spacing:-.01em!important}
+.nk .fa-panel h3{font-size:15px!important;font-weight:700!important}
+.nk :is(.fw-summary,.fa-panel) :is(p,select,input,option,button,a){font-size:12px!important}
+.nk :is(.fw-summary,.fa-panel) :is(label,small,span,strong){font-size:11px!important}
+.nk .fw-summary .fw-risk{text-transform:none!important;letter-spacing:0!important;font-weight:600!important;white-space:nowrap}
+.nk .fw-summary-head span,.nk .fw-summary-head p{font-size:12px!important}
