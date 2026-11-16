@@ -14,6 +14,11 @@
   <a href="#data-sources-and-credits">Sources</a>
 </p>
 
+| | |
+|---|---|
+| **Live demo** (no login needed) | https://firecal-316891526626.southamerica-east1.run.app |
+| **Source code** | https://github.com/Jyron1310/NASA_NUBEL_TEAM_NIKAL |
+
 ---
 
 ## What is Nikal?
