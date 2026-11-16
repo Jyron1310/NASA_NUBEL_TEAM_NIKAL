@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, Compass, X } from 'lucide-react'
 
-const SELECTORS = ['.fw-nubel-brand', '.nk-chapters', '.fw-summary', '.fc-map-menu', '.fc-timeline', '.fw-layers, .fc-map-menu']
+// Paso 1 (área de estudio): el recuadro lo da areaRect() (Cusco proyectado en el mapa), no un selector.
+const SELECTORS = [null, '.nk-chapters', '.fw-summary', '.fc-map-menu', '.fc-timeline', '.fw-layers, .fc-map-menu']
 
 const COPY = {
   es: {
@@ -30,19 +31,24 @@ const COPY = {
 
 const clamp = (v, min, max) => Math.max(min, Math.min(v, max))
 
-export default function TutorialGuide({ lang, prompt, open, onStart, onSkip, onClose }) {
+export default function TutorialGuide({ lang, prompt, open, onStart, onSkip, onClose, areaRect, onStep }) {
   const c = COPY[lang] || COPY.en
   const [step, setStep] = useState(0)
   const [rect, setRect] = useState(null)
   useEffect(() => {
     if (!open) { setStep(0); setRect(null); return undefined }
     const update = () => {
-      const box = document.querySelector(SELECTORS[step])?.getBoundingClientRect()
-      setRect(box ? { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height } : null)
+      const box = SELECTORS[step] ? document.querySelector(SELECTORS[step])?.getBoundingClientRect() : areaRect?.()
+      const r = box ? { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height } : null
+      setRect((prev) => (prev && r && ['left', 'top', 'width', 'height'].every((k) => Math.abs(prev[k] - r[k]) < 1) ? prev : r))
     }
-    update(); const timer = window.setTimeout(update, 250); window.addEventListener('resize', update)
-    return () => { window.clearTimeout(timer); window.removeEventListener('resize', update) }
-  }, [open, step])
+    // El mapa puede seguir cargando o encuadrando a Cusco: en el paso del mapa se vuelve a medir cada 0,4 s.
+    update(); const timer = window.setTimeout(update, 250)
+    const cada = SELECTORS[step] ? null : window.setInterval(update, 400)
+    window.addEventListener('resize', update)
+    return () => { window.clearTimeout(timer); if (cada) window.clearInterval(cada); window.removeEventListener('resize', update) }
+  }, [open, step, areaRect])
+  useEffect(() => { if (open) onStep?.(step) }, [open, step, onStep])
   const position = useMemo(() => {
     const width = Math.min(360, window.innerWidth - 28), height = 250, gap = 18
     if (!rect || window.innerWidth < 680) return { left: 14, top: window.innerHeight - height - 14, width }

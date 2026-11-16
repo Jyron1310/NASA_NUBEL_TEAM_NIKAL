@@ -352,6 +352,19 @@ function FireMapApp() {
   const welcomeOpen = WELCOME
   const [tutorialPrompt, setTutorialPrompt] = useState(AVISO_TUTORIAL)
   const [tutorialOpen, setTutorialOpen] = useState(forceTutorial)
+  // Recuadro de Cusco en pantalla (para el paso "Área de estudio" del tutorial), recortado a la ventana.
+  const cuscoRect = useCallback(() => {
+    const map = mapRef.current
+    if (!map || !region) return null
+    const b = boundsOf(region)
+    const nw = map.project(b.getNorthWest()), se = map.project(b.getSouthEast())
+    const r = map.getContainer().getBoundingClientRect()
+    const left = Math.max(8, r.left + nw.x), top = Math.max(8, r.top + nw.y)
+    const right = Math.min(window.innerWidth - 8, r.left + se.x), bottom = Math.min(window.innerHeight - 8, r.top + se.y)
+    return right > left && bottom > top ? { left, top, right, bottom, width: right - left, height: bottom - top } : null
+  }, [region])
+  // En el celular el panel de datos tapa el mapa: el tutorial lo abre solo en su paso ("Datos y filtros").
+  const pasoTutorial = useCallback((paso) => { if (window.innerWidth < 680) setDetailsOpen(paso === 2) }, [])
   const startTutorial = () => { setTutorialPrompt(false); setTutorialOpen(true); setDetailsOpen(true); setSimpleOpen(false); setCompareOpen(false); setAmbitosOpen(false); setToolsOpen(false) }
   const closeTutorial = () => { setTutorialPrompt(false); setTutorialOpen(false) }
   // Juego oculto (tres clics en el logo). La apertura de marca está en index.html.
@@ -998,7 +1011,7 @@ function FireMapApp() {
         </div>
       </section>
       </>}
-      <TutorialGuide lang={lang} prompt={tutorialPrompt} open={tutorialOpen} onStart={startTutorial} onSkip={closeTutorial} onClose={closeTutorial}/>
+      <TutorialGuide lang={lang} prompt={tutorialPrompt} open={tutorialOpen} onStart={startTutorial} onSkip={closeTutorial} onClose={closeTutorial} areaRect={cuscoRect} onStep={pasoTutorial}/>
       {snake && <NikalSnake origen={snake} onClose={() => setSnake(null)}/>}
     </div>
   )
